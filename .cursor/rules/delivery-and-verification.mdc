@@ -1,0 +1,38 @@
+---
+description: Verify locally, leave runnable, summarize briefly after shipping
+alwaysApply: true
+---
+
+# Delivery & Verification
+
+Ship work in a runnable state. Verify before declaring done.
+
+## After implementing
+
+1. Install deps if needed for the change.
+2. Run the relevant checks: dev server, build, lint, and/or tests.
+3. Fix failures you introduce.
+4. If blocked on user credentials/env, leave the app runnable with clear setup steps.
+
+## Definition of done (per slice)
+
+- Core path works end-to-end for that slice
+- Loading/empty/error states present where user-facing
+- No obvious console/build breakage from the change
+- Assumptions and tradeoffs are stated briefly
+
+## Summaries (keep short)
+
+Include only:
+
+1. **What shipped**
+2. **Key decisions / assumptions**
+3. **How to run**
+4. **What’s next** (optional, 1–3 bullets)
+
+## DO / DON'T
+
+- ✅ DO: “Run `npm install && npm run dev` — open `/`.”
+- ✅ DO: Call out missing `DATABASE_URL` and the exact env var needed.
+- ❌ DON'T: Claim “done” without running what you can locally.
+- ❌ DON'T: Long post-mortems or restating the whole plan in the summary.

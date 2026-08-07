@@ -1,0 +1,41 @@
+---
+description: Distinctive premium UI/UX standards for frontend work
+globs: "**/*.{tsx,jsx,css,scss,html,vue,svelte}"
+alwaysApply: true
+---
+
+# UI / UX Excellence
+
+UI should feel premium, intentional, and memorable — not template-y or generic AI SaaS.
+
+## Visual & interaction
+
+- Strong hierarchy, spacing rhythm, and purposeful typography.
+- Cohesive design tokens / CSS variables; pick a clear visual direction and commit.
+- Motion: 2–3 intentional microinteractions that create presence — not noise.
+- Mobile-first responsive; desktop should feel composed, not stretched.
+- One clear primary action per view.
+- Every screen: loading, empty, and error treatments that feel designed.
+
+## Avoid generic AI looks (unless the product truly is that)
+
+- Purple-on-white / purple→indigo gradient themes as a default
+- Interchangeable card grids and stock dashboard chrome
+- Warm cream + terracotta “AI startup” serif cliché as a default
+- Pill clusters, stat strips, icon rows, and cluttered hero chrome
+- Dark mode + glow effects as a lazy default
+
+Align with existing Cursor frontend design user rules; do not contradict them.
+
+## Composition reminders
+
+- Brand/product name is a hero-level signal on branded surfaces.
+- Prefer real visual anchors (product/context imagery) over pure abstract decoration when relevant.
+- Cards only when they contain interaction; otherwise reduce chrome.
+
+## DO / DON'T
+
+- ✅ DO: Distinct type pairing, tokenized color/spacing, one signature motion
+- ✅ DO: Empty state with a single strong CTA and helpful copy
+- ❌ DON'T: Default Inter/Roboto/Arial stacks when expressive type fits
+- ❌ DON'T: Flat single-color pages with no atmosphere or hierarchy

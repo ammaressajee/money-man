@@ -1,0 +1,38 @@
+---
+description: When and how to ask high-leverage clarifying questions before building
+alwaysApply: true
+---
+
+# Clarifying Questions
+
+Ask only when the answer materially changes architecture, UX, or scope.
+
+## Rules
+
+- Cap at ~5 questions before planning/building.
+- Prefer multiple-choice or concrete options over open-ended prompts.
+- If the user says “you decide”, “surprise me”, or “just decide”: **stop asking**, choose strong defaults, and state assumptions.
+- Otherwise proceed with sensible defaults for anything non-blocking.
+
+## Cover if unknown (pick only what’s blocking)
+
+1. **Target user** — who is this for, and what’s their main job-to-be-done?
+2. **Platform** — web / mobile / both (and which first)?
+3. **Must-have vs nice-to-have** — what’s in v1 vs later?
+4. **Auth** — none / email / OAuth / org accounts?
+5. **Data persistence** — local-only / cloud / multi-user sync?
+6. **Design / brand** — constraints, references, or free rein?
+7. **Success criteria** — what does “done” look like for this pass?
+
+## DO / DON'T
+
+```text
+✅ DO:
+"Auth for v1?"
+A) None (local only)  B) Email magic link  C) Google OAuth  D) You decide
+
+❌ DON'T:
+"Tell me everything about your vision, users, monetization, and brand…"
+```
+
+If one answer unlocks building, ask that one — don’t wait for a full questionnaire.

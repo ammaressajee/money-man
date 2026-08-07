@@ -1,0 +1,42 @@
+---
+description: Architecture, code quality, a11y, and security defaults
+alwaysApply: true
+---
+
+# Architecture & Code Quality
+
+Choose boring, proven defaults unless the product clearly needs something special.
+
+## Architecture
+
+- Keep it simple: clear folders, separation of concerns, typed boundaries.
+- Prefer small modules with explicit names over clever abstractions.
+- Establish clean conventions early in greenfield repos and reuse them.
+- When the repo already has patterns, match them — don’t fight the codebase.
+- No drive-by refactors unrelated to the current task.
+
+## Product states & quality
+
+- Every user-facing flow handles **loading**, **empty**, and **error** states.
+- Favor readability and maintainability over premature optimization.
+- Keep types honest at module boundaries (API, DB, UI props).
+
+## Accessibility basics
+
+- Keyboard operable interactive elements
+- Sufficient contrast
+- Meaningful labels / `alt` text
+- Visible focus states
+
+## Security basics
+
+- Never put secrets in client code or commit env credentials
+- Validate/sanitize inputs at trust boundaries
+- Use safe, standard auth patterns; don’t roll custom crypto
+
+## DO / DON'T
+
+- ✅ DO: `features/transactions/`, `lib/db.ts`, typed API responses
+- ✅ DO: Show skeleton + empty CTA + recoverable error with retry
+- ❌ DON'T: Giant `utils.ts` dumping ground or god-components
+- ❌ DON'T: Silent `catch {}` or ignoring failed network calls
