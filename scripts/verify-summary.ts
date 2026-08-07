@@ -14,8 +14,10 @@ const data: HouseholdData = {
   fixedItems: [
     { id: 'f1', name: 'Rent', amount: 1000, frequency: 'monthly', category: 'Housing', kind: 'expense', owner: 'joint', active: true, created_at: '2026-01-01T00:00:00Z' },
     { id: 'f2', name: 'Car', amount: 200, frequency: 'monthly', category: 'Car', kind: 'expense', owner: 'ammar', active: true, created_at: '2026-01-01T00:00:00Z' },
-    { id: 'f3', name: 'Roth', amount: 500, frequency: 'monthly', category: 'Investing', kind: 'investment', owner: 'ammar', active: true, created_at: '2026-01-01T00:00:00Z' },
+    { id: 'f3', name: 'Roth', amount: 500, frequency: 'monthly', category: 'Retirement', kind: 'retirement', owner: 'ammar', active: true, created_at: '2026-01-01T00:00:00Z' },
     { id: 'f4', name: 'Old sub', amount: 999, frequency: 'monthly', category: 'Other', kind: 'expense', owner: 'joint', active: false, created_at: '2026-01-01T00:00:00Z' },
+    { id: 'f5', name: 'Index Funds', amount: 250, frequency: 'monthly', category: 'Investing', kind: 'investment', owner: 'ammar', active: true, created_at: '2026-01-01T00:00:00Z' },
+    { id: 'f6', name: 'HYSA', amount: 100, frequency: 'monthly', category: 'Savings', kind: 'saving', owner: 'fiancee', active: true, created_at: '2026-01-01T00:00:00Z' },
   ],
   creditCards: [
     { id: 'c1', name: 'Chase Sapphire', owner: 'ammar', active: true, created_at: '2026-01-01T00:00:00Z' },
@@ -38,7 +40,9 @@ const combined = ammarIncome + 3000
 const ratio = ammarIncome / combined
 const ammarAutoSavings = (300 * 26) / 12 // 650
 const expectedLoggedOutflow = 400 + 100 // cards + other
-const expectedSavingsRate = (500 + ammarAutoSavings) / combined
+const expectedSaving = ammarAutoSavings + 100 // auto-transfers + HYSA
+const expectedWealth = expectedSaving + 250 + 500 // + index funds + roth
+const expectedSavingsRate = expectedWealth / combined
 
 const checks: [string, number, number][] = [
   ['ammar income', s.ammar.income, ammarIncome],
@@ -46,12 +50,19 @@ const checks: [string, number, number][] = [
   ['ammar ratio', s.ammar.incomeRatio, ratio],
   ['joint expenses (inactive excluded)', s.jointExpenses, 1000],
   ['ammar fair share', s.ammar.fairShare, 1000 * ratio],
-  ['ammar investing (roth + auto)', s.ammar.investing, 500 + ammarAutoSavings],
+  ['ammar saving (auto only)', s.ammar.saving, ammarAutoSavings],
+  ['ammar investing (index funds)', s.ammar.investing, 250],
+  ['ammar retirement (roth)', s.ammar.retirement, 500],
+  ['ammar wealth (saving+invest+retire)', s.ammar.wealth, ammarAutoSavings + 250 + 500],
+  ['fiancee saving (HYSA, no auto)', s.fiancee.saving, 100],
   ['ammar card spend (old stmt excluded)', s.ammar.cardSpend, 400],
   ['ammar other spend', s.ammar.otherSpend, 100],
-  ['total saved/invested', s.totalSavedInvested, 500 + ammarAutoSavings],
+  ['total saving', s.totalSaving, expectedSaving],
+  ['total investing', s.totalInvesting, 250],
+  ['total retirement', s.totalRetirement, 500],
+  ['total saved/invested', s.totalSavedInvested, expectedWealth],
   ['combined outflow', s.combinedOutflow, 1000 + 200 + 400 + 100],
-  ['net leftover', s.netLeftover, combined - 1700 - (500 + ammarAutoSavings)],
+  ['net leftover', s.netLeftover, combined - 1700 - expectedWealth],
   ['ammar total outflow', s.ammar.totalOutflow, 200 + 1000 * ratio + 400 + 100],
   ['logged outflow (cards+other only)', s.loggedOutflow, expectedLoggedOutflow],
   ['savings rate', s.savingsRate, expectedSavingsRate],

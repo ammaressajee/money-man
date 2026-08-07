@@ -1,14 +1,18 @@
--- Our Money — Supabase schema
+-- Money Man — Supabase schema
 -- Run this in the Supabase SQL Editor (Dashboard > SQL Editor > New query).
 
--- Fixed recurring costs — expenses AND investment contributions, distinguished by `kind`
+-- Fixed recurring costs — expenses AND wealth contributions, distinguished by `kind`:
+--   'expense'    → spending (rent, insurance, subscriptions…)
+--   'saving'     → cash savings (HYSA, emergency fund…)
+--   'investment' → brokerage / taxable investing
+--   'retirement' → Roth IRA, 401(k), HSA…
 create table fixed_items (
   id uuid primary key default gen_random_uuid(),
   name text not null,                     -- e.g. "Rent", "Car Insurance", "Roth IRA", "Spotify"
   amount numeric not null,
   frequency text not null check (frequency in ('monthly','annual')),
   category text not null,                 -- e.g. 'Housing','Insurance','Subscriptions','Utilities','Investing','Other'
-  kind text not null check (kind in ('expense','investment')),
+  kind text not null check (kind in ('expense','saving','investment','retirement')),
   owner text not null check (owner in ('ammar','fiancee','joint')),
   active boolean default true,
   created_at timestamptz default now()

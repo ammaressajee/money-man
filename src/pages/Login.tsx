@@ -50,7 +50,7 @@ export default function Login() {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1.5 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-[15px] transition-colors focus:border-accent"
+            className="mt-1.5 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-base transition-colors focus:border-accent"
           />
 
           <label className="mt-4 block text-sm font-medium" htmlFor="password">
@@ -63,7 +63,7 @@ export default function Login() {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1.5 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-[15px] transition-colors focus:border-accent"
+            className="mt-1.5 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-base transition-colors focus:border-accent"
           />
 
           {error && (

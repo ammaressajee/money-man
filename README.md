@@ -1,4 +1,4 @@
-# Our Money
+# Money Man
 
 A shared monthly money snapshot for two. Income in, fixed costs out, one card
 balance per statement cycle — and a clear headline: how much you saved and
@@ -41,16 +41,19 @@ can explore every screen. Connect Supabase to go live.
 
 ### Migrating an existing database
 
-If you created the database before this update, run the migration to enforce
-card-statement uniqueness (prevents double-counting spend):
+If you created the database before these updates, run the migrations in order
+in the Supabase SQL Editor. Both are safe on live data — no rows are deleted:
 
 ```sql
 -- supabase/migrations/001_card_statements_unique.sql
--- Open SQL Editor in Supabase Dashboard and paste this file's contents.
-```
+--   Enforces card-statement uniqueness (prevents double-counting spend);
+--   deduplicates existing rows first, keeping the newest per card/date.
 
-The migration deduplicates any existing rows (keeping the newest per card/date)
-before adding the constraint, so it is safe to run on live data.
+-- supabase/migrations/002_wealth_kinds.sql
+--   Widens fixed_items.kind from expense/investment to
+--   expense/saving/investment/retirement. Existing rows keep working;
+--   afterwards, edit items in Manage to reclassify (e.g. Roth IRA → Retire).
+```
 
 ## Deploy to Netlify
 
@@ -101,8 +104,10 @@ flowchart TB
 - Everything is normalized to monthly: biweekly × 26⁄12, annual ÷ 12.
 - Joint costs are split **proportionally to each partner's income**, recomputed
   live from entered income — not a hardcoded 50/50.
-- Auto-savings transfers and investment items (e.g. Roth IRA) count as
-  **Saved & Invested** — never as expenses.
+- Wealth-building fixed items come in three kinds, each tracked separately on
+  the dashboard: **Saving** (HYSA, emergency fund), **Investment** (brokerage),
+  and **Retirement** (Roth IRA, 401(k)). Paycheck auto-savings transfers count
+  as Saving. Together they make up **Saved & Invested** — never expenses.
 - Card statements count toward the month their closing date falls in.
 - "Other spend" is a single monthly estimate per person for debit/cash
   spending that didn't hit a tracked card.

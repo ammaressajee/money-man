@@ -10,6 +10,7 @@ import { AppHeader } from '../components/AppHeader'
 import { AnimatedNumber } from '../components/AnimatedNumber'
 import { DashboardSkeleton } from '../components/Loader'
 import { MissingStatementsBanner } from '../components/dashboard/MissingStatementsBanner'
+import { MonthlyFlowCard } from '../components/dashboard/MonthlyFlowCard'
 import { SetupChecklist } from '../components/dashboard/SetupChecklist'
 
 // Charts pull in Recharts (~450 kB min) — split them out of the initial bundle.
@@ -116,8 +117,9 @@ export default function Dashboard() {
           )}
 
           <HeroCard summary={current} prior={prior} />
-          <LeftoverCard summary={current} />
+          <MonthlyFlowCard summary={current} style={riseOrder(1)} />
           <StatRow summary={current} prior={prior} />
+          {current.netLeftover < 0 && <OverspendCard summary={current} />}
 
           {current.combinedIncome > 0 && current.jointExpenses > 0 ? (
             <FairnessCard summary={current} />
@@ -227,31 +229,28 @@ function HeroCard({ summary, prior }: { summary: MonthlySummary; prior?: Monthly
   )
 }
 
-function LeftoverCard({ summary }: { summary: MonthlySummary }) {
-  const isNegative = summary.netLeftover < 0
+function OverspendCard({ summary }: { summary: MonthlySummary }) {
   const overspend = Math.abs(summary.netLeftover)
 
   return (
     <section
-      className={`rise rounded-card p-5 shadow-card ${isNegative ? 'border border-danger/20 bg-clay-soft' : 'bg-card'}`}
-      style={riseOrder(1)}
+      className="rise rounded-card border border-danger/20 bg-clay-soft p-5 shadow-card"
+      style={riseOrder(2)}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold">Leftover, unallocated</h2>
+          <h2 className="text-sm font-semibold text-danger">Over budget this month</h2>
           <p className="mt-0.5 text-xs text-ink-soft">
-            Cash still in checking after bills, cards, and investing
+            Spending and saving together exceed income
           </p>
         </div>
-        <p className={`num shrink-0 text-2xl font-bold ${isNegative ? 'text-danger' : ''}`}>
-          <AnimatedNumber value={summary.netLeftover} />
+        <p className="num shrink-0 text-2xl font-bold text-danger">
+          <AnimatedNumber value={-overspend} />
         </p>
       </div>
-      {isNegative && (
+      {summary.completeness.isCardSpendIncomplete && (
         <p className="mt-3 text-sm text-danger">
-          Spending and investing exceed income by {formatMoney(overspend)} this month.
-          {summary.completeness.isCardSpendIncomplete &&
-            ' Log missing card statements — spending totals may be understated.'}
+          Log missing card statements — spending totals may be understated.
         </p>
       )}
     </section>
@@ -259,39 +258,62 @@ function LeftoverCard({ summary }: { summary: MonthlySummary }) {
 }
 
 function StatRow({ summary, prior }: { summary: MonthlySummary; prior?: MonthlySummary }) {
-  const momSavingsDelta =
-    prior !== undefined ? summary.totalSavedInvested - prior.totalSavedInvested : null
+  const delta = (now: number, before?: number) =>
+    before !== undefined
+      ? `${now - before >= 0 ? '+' : ''}${formatMoney(now - before)} vs last month`
+      : null
 
   const stats = [
     {
-      label: 'Combined income',
+      label: 'Income',
       value: formatMoney(summary.combinedIncome),
-      hint: null,
+      hint: null as string | null,
+      dot: null as string | null,
     },
     {
-      label: 'Total spending',
+      label: 'Spending',
       value: formatMoney(summary.combinedOutflow),
-      hint: null,
+      hint: delta(summary.combinedOutflow, prior?.combinedOutflow),
+      dot: 'bg-clay',
     },
     {
-      label: 'Savings rate',
-      value: formatPercent(summary.savingsRate),
-      hint:
-        momSavingsDelta !== null
-          ? `${momSavingsDelta >= 0 ? '+' : ''}${formatMoney(momSavingsDelta)} vs last month`
-          : null,
+      label: 'Saved total',
+      value: formatMoney(summary.totalSavedInvested),
+      hint: `${formatPercent(summary.savingsRate)} of income`,
+      dot: null,
+    },
+    {
+      label: 'Savings',
+      value: formatMoney(summary.totalSaving),
+      hint: null,
+      dot: 'bg-save',
+    },
+    {
+      label: 'Invested',
+      value: formatMoney(summary.totalInvesting),
+      hint: null,
+      dot: 'bg-invest',
+    },
+    {
+      label: 'Retirement',
+      value: formatMoney(summary.totalRetirement),
+      hint: null,
+      dot: 'bg-retire',
     },
   ]
 
   return (
     <section
-      className="rise grid grid-cols-1 gap-3 sm:grid-cols-3"
-      style={riseOrder(2)}
+      className="rise grid grid-cols-2 gap-3 sm:grid-cols-3"
+      style={riseOrder(3)}
       aria-label="Monthly totals"
     >
       {stats.map((s) => (
         <div key={s.label} className="rounded-card bg-card px-4 py-3.5 shadow-card">
-          <p className="text-xs font-medium text-ink-soft">{s.label}</p>
+          <p className="flex items-center gap-1.5 text-xs font-medium text-ink-soft">
+            {s.dot && <span className={`size-1.5 rounded-full ${s.dot}`} aria-hidden />}
+            {s.label}
+          </p>
           <p className="num mt-1 text-lg font-bold">{s.value}</p>
           {s.hint && <p className="mt-0.5 text-[11px] text-ink-faint">{s.hint}</p>}
         </div>

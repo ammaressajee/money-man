@@ -5,7 +5,7 @@ export function Wordmark() {
   return (
     <span className="flex items-center gap-2 text-[15px] font-bold tracking-tight">
       <span className="size-2.5 rounded-full bg-accent" aria-hidden />
-      Our Money
+      Money Man
     </span>
   )
 }
@@ -20,7 +20,7 @@ export function AppHeader({ subtitle }: { subtitle?: string }) {
         </p>
       )}
       <div className="flex items-center justify-between">
-        <Link to="/" className="rounded" aria-label="Our Money — home">
+        <Link to="/" className="rounded" aria-label="Money Man — home">
           <Wordmark />
         </Link>
         <div className="flex items-center gap-4">

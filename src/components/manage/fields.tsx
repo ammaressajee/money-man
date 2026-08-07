@@ -7,8 +7,9 @@ export const btnGhost =
 export const btnDanger =
   'rounded-xl px-4 py-2.5 text-sm font-semibold text-danger transition-colors hover:bg-clay-soft'
 
+// 16px input text — anything smaller makes iOS Safari zoom the page on focus.
 const inputClass =
-  'mt-1.5 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-[15px] transition-colors focus:border-accent'
+  'mt-1.5 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-base transition-colors focus:border-accent'
 
 export function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -26,7 +27,7 @@ export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
 export function MoneyInput(props: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div className="relative">
-      <span className="pointer-events-none absolute bottom-2.5 left-3.5 text-[15px] text-ink-faint">
+      <span className="pointer-events-none absolute bottom-2.5 left-3.5 text-base text-ink-faint">
         $
       </span>
       <input

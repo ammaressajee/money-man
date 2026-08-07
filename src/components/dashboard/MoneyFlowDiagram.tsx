@@ -1,5 +1,5 @@
 import { formatMoney, formatPercent } from '../../lib/money'
-import type { MonthlySummary } from '../../lib/summary'
+import type { MonthlySummary, OwnerSummary } from '../../lib/summary'
 
 /**
  * Visual map of how money moves through the household.
@@ -14,16 +14,8 @@ export function MoneyFlowDiagram({ summary }: { summary?: MonthlySummary }) {
     <div className="space-y-5" aria-label="How money flows through your household">
       {/* Personal columns */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <PersonColumn
-          name="Ammar"
-          paycheck={summary?.ammar.income}
-          shareLabel={ammarShare}
-        />
-        <PersonColumn
-          name="Bethany"
-          paycheck={summary?.fiancee.income}
-          shareLabel={fianceeShare}
-        />
+        <PersonColumn name="Ammar" summary={summary?.ammar} shareLabel={ammarShare} />
+        <PersonColumn name="Bethany" summary={summary?.fiancee} shareLabel={fianceeShare} />
       </div>
 
       {/* Converge into joint */}
@@ -67,34 +59,55 @@ export function MoneyFlowDiagram({ summary }: { summary?: MonthlySummary }) {
 
 function PersonColumn({
   name,
-  paycheck,
+  summary,
   shareLabel,
 }: {
   name: string
-  paycheck?: number
+  summary?: OwnerSummary
   shareLabel: string | null
 }) {
+  const money = (n?: number) => (n !== undefined ? `${formatMoney(n)}/mo` : undefined)
+
   return (
     <div className="rounded-2xl border border-line bg-paper/60 p-3.5">
       <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">{name}</p>
 
-      <Inflow
-        label="Paycheck"
-        amount={paycheck !== undefined ? formatMoney(paycheck) + '/mo' : undefined}
-      />
+      <Inflow label="Paycheck" amount={money(summary?.income)} />
       <FlowArrow />
       <AccountNode title="Personal Checking" tone="account" />
 
       <div className="mt-3 grid grid-cols-2 gap-2">
         <div className="space-y-2">
           <MiniArrow />
-          <AccountNode title="Savings" subtitle="Auto-transfer" tone="wealth" compact />
+          <AccountNode
+            title="Savings"
+            subtitle={money(summary?.saving) ?? 'Auto-transfer'}
+            tone="wealth"
+            compact
+          />
           <MiniArrow />
-          <AccountNode title="Roth IRA" tone="wealth" compact />
+          <AccountNode
+            title="Investments"
+            subtitle={money(summary?.investing) ?? 'Brokerage'}
+            tone="wealth"
+            compact
+          />
+          <MiniArrow />
+          <AccountNode
+            title="Retirement"
+            subtitle={money(summary?.retirement) ?? 'Roth IRA · 401(k)'}
+            tone="wealth"
+            compact
+          />
         </div>
         <div className="space-y-2">
           <MiniArrow />
-          <AccountNode title="Car · Insurance" tone="spend" compact />
+          <AccountNode
+            title="Fixed bills"
+            subtitle={money(summary?.personalExpenses) ?? 'Car · Insurance'}
+            tone="spend"
+            compact
+          />
           <MiniArrow />
           <AccountNode title="Credit Cards" subtitle="Statement cycle" tone="spend" compact />
         </div>

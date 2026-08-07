@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import type { FixedFrequency, FixedItem, FixedKind, ItemOwner } from '../../types/db'
-import { FIXED_CATEGORIES, OWNER_LABELS } from '../../types/db'
+import { FIXED_CATEGORIES, KIND_LABELS, OWNER_LABELS } from '../../types/db'
 import { formatMoneyExact } from '../../lib/money'
 import { useHouseholdData } from '../../hooks/useHouseholdData'
 import {
@@ -80,12 +80,20 @@ export function FixedItemsSection() {
   )
 }
 
+const KIND_DOTS: Record<Exclude<FixedKind, 'expense'>, string> = {
+  saving: 'bg-save',
+  investment: 'bg-invest',
+  retirement: 'bg-retire',
+}
+
 function KindBadge({ kind }: { kind: FixedKind }) {
-  return kind === 'investment' ? (
-    <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent-deep">
-      Investment
+  if (kind === 'expense') return null
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent-deep">
+      <span className={`size-1.5 rounded-full ${KIND_DOTS[kind]}`} aria-hidden />
+      {KIND_LABELS[kind]}
     </span>
-  ) : null
+  )
 }
 
 function FixedItemForm({ initial, onDone }: { initial?: FixedItem; onDone: () => void }) {
@@ -160,14 +168,19 @@ function FixedItemForm({ initial, onDone }: { initial?: FixedItem; onDone: () =>
       </Field>
       <Field label="Type">
         <Segmented
-          ariaLabel="Expense or investment"
+          ariaLabel="Expense, saving, investment, or retirement"
           options={[
             { value: 'expense', label: 'Expense' },
-            { value: 'investment', label: 'Investment' },
+            { value: 'saving', label: 'Saving' },
+            { value: 'investment', label: 'Invest' },
+            { value: 'retirement', label: 'Retire' },
           ]}
           value={kind}
           onChange={setKind}
         />
+        <p className="mt-1.5 text-xs font-normal text-ink-faint">
+          Saving = cash (HYSA, emergency fund) · Invest = brokerage · Retire = Roth IRA, 401(k)
+        </p>
       </Field>
       <Field label="Owner">
         <Segmented

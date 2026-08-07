@@ -8,7 +8,14 @@ export interface OwnerSummary {
   autoSavings: number
   personalExpenses: number
   fairShare: number
+  /** Cash savings: auto-transfers from paychecks + fixed items of kind 'saving'. */
+  saving: number
+  /** Fixed items of kind 'investment' (brokerage, taxable investing). */
   investing: number
+  /** Fixed items of kind 'retirement' (Roth IRA, 401k, HSA…). */
+  retirement: number
+  /** saving + investing + retirement. */
+  wealth: number
   cardSpend: number
   otherSpend: number
   totalOutflow: number
@@ -42,6 +49,13 @@ export interface MonthlySummary {
   combinedIncome: number
   jointExpenses: number
   combinedOutflow: number
+  /** Cash savings across both people (auto-transfers + 'saving' items). */
+  totalSaving: number
+  /** 'investment' items across both people. */
+  totalInvesting: number
+  /** 'retirement' items across both people. */
+  totalRetirement: number
+  /** totalSaving + totalInvesting + totalRetirement. */
   totalSavedInvested: number
   netLeftover: number
   /** This month's outflow split into macro categories (excludes investments). */
@@ -87,19 +101,28 @@ export function computeMonthSummary(data: HouseholdData, month: Date): MonthlySu
   const combinedIncome = income.ammar + income.fiancee
 
   const personalExpenses: Record<Owner, number> = { ammar: 0, fiancee: 0 }
+  const savingFixed: Record<Owner, number> = { ammar: 0, fiancee: 0 }
   const investingFixed: Record<Owner, number> = { ammar: 0, fiancee: 0 }
+  const retirementFixed: Record<Owner, number> = { ammar: 0, fiancee: 0 }
   let jointExpenses = 0
   const expenseByCategory = new Map<string, number>()
 
+  const wealthBuckets = {
+    saving: savingFixed,
+    investment: investingFixed,
+    retirement: retirementFixed,
+  } as const
+
   for (const f of activeFixed) {
     const monthly = monthlyAmount(f.amount, f.frequency)
-    if (f.kind === 'investment') {
-      // Joint investments are unexpected, but split evenly if they appear.
+    if (f.kind !== 'expense') {
+      const bucket = wealthBuckets[f.kind]
+      // Joint wealth contributions are unexpected, but split evenly if they appear.
       if (f.owner === 'joint') {
-        investingFixed.ammar += monthly / 2
-        investingFixed.fiancee += monthly / 2
+        bucket.ammar += monthly / 2
+        bucket.fiancee += monthly / 2
       } else {
-        investingFixed[f.owner] += monthly
+        bucket[f.owner] += monthly
       }
       continue
     }
@@ -128,21 +151,29 @@ export function computeMonthSummary(data: HouseholdData, month: Date): MonthlySu
     // With no income entered yet, fall back to an even split.
     const incomeRatio = combinedIncome > 0 ? income[owner] / combinedIncome : 0.5
     const fairShare = jointExpenses * incomeRatio
-    const investing = investingFixed[owner] + autoSavings[owner]
+    const saving = savingFixed[owner] + autoSavings[owner]
+    const investing = investingFixed[owner]
+    const retirement = retirementFixed[owner]
     owners[owner] = {
       income: income[owner],
       incomeRatio,
       autoSavings: autoSavings[owner],
       personalExpenses: personalExpenses[owner],
       fairShare,
+      saving,
       investing,
+      retirement,
+      wealth: saving + investing + retirement,
       cardSpend: cardSpend[owner],
       otherSpend: otherSpend[owner],
       totalOutflow: personalExpenses[owner] + fairShare + cardSpend[owner] + otherSpend[owner],
     }
   }
 
-  const totalSavedInvested = owners.ammar.investing + owners.fiancee.investing
+  const totalSaving = owners.ammar.saving + owners.fiancee.saving
+  const totalInvesting = owners.ammar.investing + owners.fiancee.investing
+  const totalRetirement = owners.ammar.retirement + owners.fiancee.retirement
+  const totalSavedInvested = totalSaving + totalInvesting + totalRetirement
   const combinedOutflow =
     jointExpenses +
     personalExpenses.ammar +
@@ -192,6 +223,9 @@ export function computeMonthSummary(data: HouseholdData, month: Date): MonthlySu
     combinedIncome,
     jointExpenses,
     combinedOutflow,
+    totalSaving,
+    totalInvesting,
+    totalRetirement,
     totalSavedInvested,
     netLeftover,
     categoryOutflow,

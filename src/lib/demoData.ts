@@ -1,7 +1,8 @@
 import type { HouseholdData } from '../types/db'
 import { monthStart, toMonthDateString } from './money'
 
-const STORAGE_KEY = 'our-money-demo-v1'
+// v2: wealth kinds split into saving / investment / retirement
+const STORAGE_KEY = 'our-money-demo-v2'
 
 function iso(d: Date): string {
   return d.toISOString()
@@ -88,8 +89,10 @@ function buildSeed(): HouseholdData {
       { id: 'fx-6', name: 'Car Insurance', amount: 1560, frequency: 'annual', category: 'Insurance', kind: 'expense', owner: 'ammar', active: true, created_at: origin },
       { id: 'fx-7', name: 'Car Insurance', amount: 1240, frequency: 'annual', category: 'Insurance', kind: 'expense', owner: 'fiancee', active: true, created_at: origin },
       { id: 'fx-8', name: 'Gym', amount: 45, frequency: 'monthly', category: 'Subscriptions', kind: 'expense', owner: 'fiancee', active: true, created_at: origin },
-      { id: 'fx-9', name: 'Roth IRA', amount: 583, frequency: 'monthly', category: 'Investing', kind: 'investment', owner: 'ammar', active: true, created_at: origin },
-      { id: 'fx-10', name: 'Roth IRA', amount: 500, frequency: 'monthly', category: 'Investing', kind: 'investment', owner: 'fiancee', active: true, created_at: origin },
+      { id: 'fx-9', name: 'Roth IRA', amount: 583, frequency: 'monthly', category: 'Retirement', kind: 'retirement', owner: 'ammar', active: true, created_at: origin },
+      { id: 'fx-10', name: 'Roth IRA', amount: 500, frequency: 'monthly', category: 'Retirement', kind: 'retirement', owner: 'fiancee', active: true, created_at: origin },
+      { id: 'fx-11', name: 'Index Funds', amount: 300, frequency: 'monthly', category: 'Investing', kind: 'investment', owner: 'ammar', active: true, created_at: origin },
+      { id: 'fx-12', name: 'High-Yield Savings', amount: 150, frequency: 'monthly', category: 'Savings', kind: 'saving', owner: 'fiancee', active: true, created_at: origin },
     ],
     creditCards: [...cards],
     cardStatements,

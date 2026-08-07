@@ -2,7 +2,19 @@ export type Owner = 'ammar' | 'fiancee'
 export type ItemOwner = Owner | 'joint'
 export type FixedFrequency = 'monthly' | 'annual'
 export type IncomeFrequency = 'monthly' | 'biweekly' | 'annual' | 'one_time'
-export type FixedKind = 'expense' | 'investment'
+export type FixedKind = 'expense' | 'saving' | 'investment' | 'retirement'
+
+/** Wealth-building kinds — everything that isn't spend. */
+export type WealthKind = Exclude<FixedKind, 'expense'>
+
+export const WEALTH_KINDS: WealthKind[] = ['saving', 'investment', 'retirement']
+
+export const KIND_LABELS: Record<FixedKind, string> = {
+  expense: 'Expense',
+  saving: 'Saving',
+  investment: 'Investment',
+  retirement: 'Retirement',
+}
 
 export interface FixedItem {
   id: string
@@ -73,6 +85,8 @@ export const FIXED_CATEGORIES = [
   'Insurance',
   'Car',
   'Subscriptions',
+  'Savings',
   'Investing',
+  'Retirement',
   'Other',
 ]
