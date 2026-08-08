@@ -107,11 +107,46 @@ flowchart TB
 - Wealth-building fixed items come in three kinds, each tracked separately on
   the dashboard: **Saving** (HYSA, emergency fund), **Investment** (brokerage),
   and **Retirement** (Roth IRA, 401(k)). Paycheck auto-savings transfers count
-  as Saving. Together they make up **Saved & Invested** — never expenses.
+  as Saving. Together they make up planned contributions — never expenses.
 - Card statements count toward the month their closing date falls in.
 - "Other spend" is debit/cash that didn't hit a tracked card. You can add
   multiple entries per month; an optional label notes what each was for.
 - One-time income counts in the month it was entered.
+
+### Hero number: Net wealth this month
+
+The hero shows **net wealth change** — what your household actually got richer by:
+
+```
+netWealthChange = plannedWealth − savingsDraw
+
+plannedWealth = totalSaving + totalInvesting + totalRetirement
+savingsDraw   = max(0, −netLeftover)   // pulls from savings when overspent
+netLeftover   = income − spending − plannedWealth
+```
+
+- Roth IRA and brokerage contributions count as fully met (they're automated).
+- If spending exceeds income, the shortfall is drawn from cash savings. The hero
+  dips to reflect reality while retirement stays funded.
+- A positive leftover stays in checking — unallocated cash is not added to the hero.
+- If `netWealthChange` goes negative (draw exceeds the savings contribution), the
+  hero turns red.
+
+### Monthly guidelines
+
+The dashboard shows income-based targets as a reference. These are not enforced —
+they're a "pay yourself first" benchmark to check against at a glance.
+
+| Bucket | Target | What's compared |
+|--------|--------|-----------------|
+| Retirement | 15% | Roth IRA + 401(k) contributions |
+| Cash savings | 10% | Effective saving after any draw |
+| Investing | 5% | Brokerage / taxable investing |
+| Fixed living | ≤50% | Rent, bills, insurance, car note |
+| Flexible spend | ≤20% | Net card spend + cash/debit |
+
+The flexible-spend legend (groceries ~10%, dining+entertainment ~5%, gas ~5%)
+is a mental guide only — the app does not break down card spend by category.
 
 ## Which number do I enter for a card statement?
 

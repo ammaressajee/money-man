@@ -17,9 +17,10 @@ export function MonthlyFlowCard({
 }) {
   const income = summary.combinedIncome
   const spend = summary.combinedOutflow
-  const saved = summary.totalSavedInvested
+  const saved = summary.netWealthChange
   const leftover = summary.netLeftover
   const overspent = leftover < 0
+  const hasDrawdown = summary.savingsDraw > 0
 
   // When spending + saving exceeds income, scale bars to the larger total
   // so nothing overflows the card.
@@ -90,12 +91,16 @@ export function MonthlyFlowCard({
             .join(' · ')}
         />
         <FlowRow
-          label="Savings"
-          amount={summary.totalSaving}
-          pct={pctOfIncome(summary.totalSaving)}
-          barWidth={width(summary.totalSaving)}
+          label={hasDrawdown ? 'Cash savings (drawn)' : 'Savings'}
+          amount={summary.effectiveSaving}
+          pct={pctOfIncome(summary.effectiveSaving)}
+          barWidth={width(Math.max(0, summary.effectiveSaving))}
           barClass="bg-save"
-          detail="Cash — incl. paycheck auto-transfers"
+          detail={
+            hasDrawdown
+              ? `−${formatMoney(summary.savingsDraw)} covered shortfall · net cash savings`
+              : 'Cash — incl. paycheck auto-transfers'
+          }
         />
         <FlowRow
           label="Invested"
@@ -119,7 +124,13 @@ export function MonthlyFlowCard({
           pct={pctOfIncome(Math.abs(leftover))}
           barWidth={width(Math.abs(leftover))}
           barClass={overspent ? 'bg-danger' : 'bg-ink-faint/50'}
-          detail={overspent ? 'Out + saved exceeds income this month' : 'Unallocated cash in checking'}
+          detail={
+            overspent
+              ? hasDrawdown
+                ? 'Shortfall covered from savings — see net wealth above'
+                : 'Out + saved exceeds income this month'
+              : 'Unallocated cash in checking'
+          }
           danger={overspent}
         />
       </div>

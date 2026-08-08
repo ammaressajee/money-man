@@ -76,11 +76,30 @@ export interface MonthlySummary {
   /** totalSaving + totalInvesting + totalRetirement. */
   totalSavedInvested: number
   netLeftover: number
+  /**
+   * When netLeftover < 0, this is the amount that must be pulled from cash
+   * savings to cover the shortfall. Roth and investing still ran as planned.
+   * savingsDraw = max(0, −netLeftover).
+   */
+  savingsDraw: number
+  /**
+   * True net wealth change: planned contributions minus the savings draw.
+   * = totalSavedInvested − savingsDraw.
+   * Can be negative if spending overwhelms even the savings balance.
+   */
+  netWealthChange: number
+  /**
+   * Cash savings after absorbing any draw: totalSaving − savingsDraw.
+   * Negative means savings were pulled beyond the monthly contribution.
+   */
+  effectiveSaving: number
+  /** netWealthChange / combinedIncome, 0 when no income. */
+  netSavingsRate: number
   /** This month's outflow split into macro categories (excludes investments). */
   categoryOutflow: CategorySlice[]
   /** Card (net) + other spend only — the portions that are truly month-specific. */
   loggedOutflow: number
-  /** totalSavedInvested / combinedIncome, 0 when no income. */
+  /** totalSavedInvested / combinedIncome, 0 when no income. (planned, before draw) */
   savingsRate: number
   /** Which active cards are missing a statement for this month. */
   completeness: MonthCompleteness
@@ -243,10 +262,15 @@ export function computeMonthSummary(data: HouseholdData, month: Date): MonthlySu
 
   const netLeftover = combinedIncome - combinedOutflow - totalSavedInvested
 
+  const savingsDraw = Math.max(0, -netLeftover)
+  const netWealthChange = totalSavedInvested - savingsDraw
+  const effectiveSaving = totalSaving - savingsDraw
+
   const loggedOutflow =
     cardSpendNet.ammar + cardSpendNet.fiancee + otherSpend.ammar + otherSpend.fiancee
 
   const savingsRate = combinedIncome > 0 ? totalSavedInvested / combinedIncome : 0
+  const netSavingsRate = combinedIncome > 0 ? netWealthChange / combinedIncome : 0
 
   // Category breakdown — uses net card spend so the chart isn't double-counting.
   const totalCards = cardSpendNet.ammar + cardSpendNet.fiancee
@@ -304,6 +328,10 @@ export function computeMonthSummary(data: HouseholdData, month: Date): MonthlySu
     totalRetirement,
     totalSavedInvested,
     netLeftover,
+    savingsDraw,
+    netWealthChange,
+    effectiveSaving,
+    netSavingsRate,
     categoryOutflow,
     loggedOutflow,
     savingsRate,

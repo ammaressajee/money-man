@@ -22,7 +22,7 @@ export function TrendChart({ summaries, selectedKey }: Props) {
     key: s.key,
     loggedSpend: Math.round(s.loggedOutflow),
     income: Math.round(s.combinedIncome),
-    invested: Math.round(s.totalSavedInvested),
+    invested: Math.round(s.netWealthChange),
   }))
 
   return (
@@ -100,11 +100,11 @@ export function TrendChart({ summaries, selectedKey }: Props) {
               fill="transparent"
               dot={false}
             />
-            {/* Dashed: saved/invested — uses current setup for every month */}
+            {/* Dashed: net wealth — uses current setup for every month; dips if overspent */}
             <Area
               type="monotone"
               dataKey="invested"
-              name="Saved / invested (today's setup)"
+              name="Net wealth (today's setup)"
               stroke="#0e7a6d"
               strokeWidth={2.5}
               strokeDasharray="5 4"
@@ -137,7 +137,7 @@ export function TrendChart({ summaries, selectedKey }: Props) {
               background: 'repeating-linear-gradient(to right, #0e7a6d 0, #0e7a6d 4px, transparent 4px, transparent 7px)',
             }}
           />
-          Saved / invested
+          Net wealth
         </span>
       </div>
 
@@ -147,7 +147,7 @@ export function TrendChart({ summaries, selectedKey }: Props) {
           <p key={s.key} className="flex justify-between text-xs text-ink-soft">
             <span>{formatMonthAxis(s.month)}</span>
             <span className="num">
-              spent {formatMoney(s.loggedOutflow)} · saved {formatMoney(s.totalSavedInvested)}
+              spent {formatMoney(s.loggedOutflow)} · net wealth {formatMoney(s.netWealthChange)}
             </span>
           </p>
         ))}
@@ -159,7 +159,7 @@ export function TrendChart({ summaries, selectedKey }: Props) {
             <th scope="col">Month</th>
             <th scope="col">Logged spend</th>
             <th scope="col">Income</th>
-            <th scope="col">Saved / invested</th>
+            <th scope="col">Net wealth</th>
           </tr>
         </thead>
         <tbody>
@@ -168,7 +168,7 @@ export function TrendChart({ summaries, selectedKey }: Props) {
               <td>{s.label}</td>
               <td>{formatMoney(s.loggedOutflow)}</td>
               <td>{formatMoney(s.combinedIncome)}</td>
-              <td>{formatMoney(s.totalSavedInvested)}</td>
+              <td>{formatMoney(s.netWealthChange)}</td>
             </tr>
           ))}
         </tbody>

@@ -134,9 +134,9 @@ export default function MoneyFlow() {
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <span className="size-1.5 rounded-full bg-accent" aria-hidden />
-                  Saved{' '}
+                  Net wealth{' '}
                   <strong className="num text-ink">
-                    {formatMoney(current.totalSavedInvested)}
+                    {formatMoney(current.netWealthChange)}
                   </strong>
                 </span>
               </div>

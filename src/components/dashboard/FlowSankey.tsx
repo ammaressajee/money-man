@@ -68,7 +68,7 @@ export function FlowSankey({ summary }: { summary: MonthlySummary }) {
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
           className="rise w-full min-w-[560px]"
           role="img"
-          aria-label={`Money flow for ${summary.label}: ${formatMoney(summary.combinedIncome)} in, ${formatMoney(summary.combinedOutflow)} spent, ${formatMoney(summary.totalSavedInvested)} saved and invested.`}
+          aria-label={`Money flow for ${summary.label}: ${formatMoney(summary.combinedIncome)} in, ${formatMoney(summary.combinedOutflow)} spent, ${formatMoney(summary.netWealthChange)} net wealth.`}
         >
           <defs>
             {layout.links.map((link, i) => (

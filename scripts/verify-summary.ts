@@ -81,6 +81,11 @@ const checks: [string, number, number][] = [
   ['ammar total outflow',                      s.ammar.totalOutflow,       200 + jointExpected * ratio + c1Net + 100],
   ['logged outflow (net cards+other only)',     s.loggedOutflow,            expectedLoggedOutflow],
   ['savings rate',                             s.savingsRate,              expectedSavingsRate],
+  // Overdraft / net wealth fields — balanced month (no drawdown expected)
+  ['savingsDraw (no shortfall)',               s.savingsDraw,              0],
+  ['netWealthChange (no shortfall)',           s.netWealthChange,          expectedWealth],
+  ['effectiveSaving (no shortfall)',           s.effectiveSaving,          expectedSaving],
+  ['netSavingsRate (no shortfall)',            s.netSavingsRate,           expectedSavingsRate],
 ]
 
 let failed = 0
@@ -148,6 +153,46 @@ if (!refundGrossOk) failed++
 if (!refundNetOk) failed++
 console.log(`${refundGrossOk ? 'PASS' : 'FAIL'}  refund cycle: gross = -50`)
 console.log(`${refundNetOk   ? 'PASS' : 'FAIL'}  refund cycle: net clamped to 0`)
+
+// ─── Overdraft / savings-draw check ─────────────────────────────────────────
+// A month where card spend is so high that spend + planned wealth > income.
+// We add a massive card statement to force a shortfall.
+// Income (combined) = ammarIncome + 3000 ≈ 8633
+// Planned wealth = expectedWealth ≈ ammarAutoSavings(650) + HYSA(100) + indexFunds(250) + roth(500) = 1500
+// Fixed spend = jointExpected(1060) + carNote(200) = 1260
+// To cause shortfall we need card spend > income - wealth - fixedSpend = 8633 - 1500 - 1260 = 5873
+// Use 7000 gross on c1 (overlap still 60, so net = 6940)
+const dataOverdraft: HouseholdData = {
+  ...data,
+  cardStatements: [
+    { id: 'od1', card_id: 'c1', statement_date: `${thisMonth}-15`, balance: 7000, created_at: '2026-01-01T00:00:00Z' },
+  ],
+  // Remove c2 (already missing in base, this keeps both active for simplicity)
+}
+const sOD = computeMonthSummary(dataOverdraft, new Date(now.getFullYear(), now.getMonth(), 1))
+const odCardNet = 7000 - internetMonthly  // 6940
+const odOutflow = jointExpected + 200 + odCardNet + 100   // no other spend for fiancee in base outside c2
+const odLeftover = combined - odOutflow - expectedWealth
+// leftover is negative — savingsDraw = -leftover
+const odExpectedDraw = Math.max(0, -odLeftover)
+const odExpectedNetWealth = expectedWealth - odExpectedDraw
+// Retirement and investing are untouched; only effectiveSaving changes
+const odExpectedEffectiveSaving = expectedSaving - odExpectedDraw
+
+const odChecks: [string, number, number][] = [
+  ['overdraft: savingsDraw = -netLeftover',          sOD.savingsDraw,         odExpectedDraw],
+  ['overdraft: netWealthChange = planned - draw',    sOD.netWealthChange,     odExpectedNetWealth],
+  ['overdraft: totalRetirement unchanged',           sOD.totalRetirement,     500],
+  ['overdraft: effectiveSaving = saving - draw',     sOD.effectiveSaving,     odExpectedEffectiveSaving],
+  ['overdraft: netSavingsRate = netWealth/income',   sOD.netSavingsRate,      odExpectedNetWealth / combined],
+]
+
+console.log('\n── Overdraft checks ──')
+for (const [name, actual, expected] of odChecks) {
+  const ok = Math.abs(actual - expected) < 0.01
+  if (!ok) failed++
+  console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}: got ${actual.toFixed(4)}, expected ${expected.toFixed(4)}`)
+}
 
 console.log(failed === 0 ? '\nAll checks passed.' : `\n${failed} check(s) FAILED.`)
 process.exit(failed === 0 ? 0 : 1)
