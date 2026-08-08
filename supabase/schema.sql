@@ -49,12 +49,13 @@ create table card_statements (
   constraint card_statements_card_id_statement_date_key unique (card_id, statement_date)
 );
 
--- Monthly manual estimate to catch debit spend not on a tracked credit card
+-- Debit/cash spend not on a tracked credit card (one or more rows per person per month)
 create table other_spend (
   id uuid primary key default gen_random_uuid(),
   owner text not null check (owner in ('ammar','fiancee')),
-  month date not null,                    -- first of the month this estimate covers
+  month date not null,                    -- first of the month this entry covers
   amount numeric not null,
+  label text not null default '',         -- optional note, e.g. "farmer's market cash"
   created_at timestamptz default now()
 );
 

@@ -52,6 +52,7 @@ function buildSeed(): HouseholdData {
         owner,
         month: toMonthDateString(month),
         amount,
+        label: i % 3 === 0 ? 'Cash' : '',
         created_at: iso(month),
       }
     }),

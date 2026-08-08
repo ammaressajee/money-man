@@ -29,7 +29,7 @@ const data: HouseholdData = {
     // c2 has NO statement this month — should appear in missingStatements
   ],
   otherSpend: [
-    { id: 'o1', owner: 'ammar', month: `${thisMonth}-01`, amount: 100, created_at: '2026-01-01T00:00:00Z' },
+    { id: 'o1', owner: 'ammar', month: `${thisMonth}-01`, amount: 100, label: 'ATM cash', created_at: '2026-01-01T00:00:00Z' },
   ],
 }
 

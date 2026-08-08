@@ -109,8 +109,8 @@ flowchart TB
   and **Retirement** (Roth IRA, 401(k)). Paycheck auto-savings transfers count
   as Saving. Together they make up **Saved & Invested** — never expenses.
 - Card statements count toward the month their closing date falls in.
-- "Other spend" is a single monthly estimate per person for debit/cash
-  spending that didn't hit a tracked card.
+- "Other spend" is debit/cash that didn't hit a tracked card. You can add
+  multiple entries per month; an optional label notes what each was for.
 - One-time income counts in the month it was entered.
 
 ## Local verification

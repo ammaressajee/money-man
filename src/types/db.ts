@@ -60,6 +60,8 @@ export interface OtherSpend {
   owner: Owner
   month: string
   amount: number
+  /** Optional note for what the cash/debit spend was for. */
+  label: string
   created_at: string
 }
 
