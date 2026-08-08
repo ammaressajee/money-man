@@ -142,27 +142,35 @@ export interface SankeyLink {
   ty: number
 }
 
+export type SankeyOrientation = 'horizontal' | 'vertical'
+
 export interface SankeyLayout {
   nodes: SankeyNode[]
   links: SankeyLink[]
   nodeWidth: number
+  orientation: SankeyOrientation
+  width: number
+  height: number
 }
 
 interface LayoutOptions {
   width: number
   height: number
   nodeWidth?: number
-  /** Vertical gap between nodes in the same column. */
+  /** Gap between nodes in the same column (along the value axis). */
   gap?: number
+  orientation?: SankeyOrientation
 }
 
-const MIN_NODE_HEIGHT = 3
+const MIN_NODE_SIZE = 3
 const MIN_RIBBON = 1.5
 
 export function layoutSankey(graph: FlowGraph, options: LayoutOptions): SankeyLayout {
   const { width, height } = options
-  const nodeWidth = options.nodeWidth ?? 12
-  const gap = options.gap ?? 18
+  const orientation = options.orientation ?? 'horizontal'
+  const nodeWidth = options.nodeWidth ?? (orientation === 'vertical' ? 10 : 12)
+  const gap = options.gap ?? (orientation === 'vertical' ? 10 : 18)
+  const vertical = orientation === 'vertical'
 
   // Compress logical depths to consecutive columns (e.g. joint may be absent).
   const depths = [...new Set(graph.nodes.map((n) => n.column))].sort((a, b) => a - b)
@@ -195,76 +203,130 @@ export function layoutSankey(graph: FlowGraph, options: LayoutOptions): SankeyLa
     n.value = Math.max(inSum, outSum)
   }
 
-  // One shared $→px scale, sized so the fullest column still fits.
+  // One shared $→px scale along the value axis (height H, width V).
+  const valueSpan = vertical ? width : height
   let scale = Infinity
   for (let c = 0; c < numCols; c++) {
     const col = nodes.filter((n) => n.column === c)
     const total = col.reduce((a, n) => a + n.value, 0)
-    const available = height - (col.length - 1) * gap - 12
+    const available = valueSpan - (col.length - 1) * gap - 12
     if (total > 0) scale = Math.min(scale, available / total)
   }
   if (!Number.isFinite(scale)) scale = 0
 
+  const flowSpan = vertical ? height - nodeWidth : width - nodeWidth
   for (let c = 0; c < numCols; c++) {
     const col = nodes.filter((n) => n.column === c)
-    const stackHeight =
-      col.reduce((a, n) => a + Math.max(n.value * scale, MIN_NODE_HEIGHT), 0) +
+    const stackSize =
+      col.reduce((a, n) => a + Math.max(n.value * scale, MIN_NODE_SIZE), 0) +
       (col.length - 1) * gap
-    const x = numCols > 1 ? (c * (width - nodeWidth)) / (numCols - 1) : 0
-    let y = (height - stackHeight) / 2
+    const flowPos = numCols > 1 ? (c * flowSpan) / (numCols - 1) : 0
+    let valuePos = (valueSpan - stackSize) / 2
     for (const n of col) {
-      n.x = x
-      n.y = y
-      n.height = Math.max(n.value * scale, MIN_NODE_HEIGHT)
-      y += n.height + gap
+      const size = Math.max(n.value * scale, MIN_NODE_SIZE)
+      if (vertical) {
+        n.x = valuePos
+        n.y = flowPos
+        n.height = size // width of the bar along the value axis
+      } else {
+        n.x = flowPos
+        n.y = valuePos
+        n.height = size
+      }
+      valuePos += size + gap
     }
   }
 
-  // Stack ribbon anchor points on each node face, centered on the node and
-  // ordered by the far end's vertical position to minimize crossings.
+  // Stack ribbon anchors on each node face, ordered to minimize crossings.
   const outCursor = new Map<SankeyNode, number>()
   const inCursor = new Map<SankeyNode, number>()
   for (const n of nodes) {
     const outTotal = links.reduce((a, l) => (l.source === n ? a + l.value : a), 0) * scale
     const inTotal = links.reduce((a, l) => (l.target === n ? a + l.value : a), 0) * scale
-    outCursor.set(n, n.y + (n.height - outTotal) / 2)
-    inCursor.set(n, n.y + (n.height - inTotal) / 2)
+    if (vertical) {
+      outCursor.set(n, n.x + (n.height - outTotal) / 2)
+      inCursor.set(n, n.x + (n.height - inTotal) / 2)
+    } else {
+      outCursor.set(n, n.y + (n.height - outTotal) / 2)
+      inCursor.set(n, n.y + (n.height - inTotal) / 2)
+    }
   }
 
-  const anchored = links.map((l) => ({ ...l, sy0: 0, sy1: 0, ty0: 0, ty1: 0 }))
-  for (const l of [...anchored].sort((a, b) => a.target.y - b.target.y || a.target.column - b.target.column)) {
-    const y0 = outCursor.get(l.source)!
-    l.sy0 = y0
-    l.sy1 = y0 + l.value * scale
-    outCursor.set(l.source, l.sy1)
+  const anchored = links.map((l) => ({ ...l, a0: 0, a1: 0, b0: 0, b1: 0 }))
+  const sortByTarget = (a: (typeof anchored)[0], b: (typeof anchored)[0]) =>
+    vertical
+      ? a.target.x - b.target.x || a.target.column - b.target.column
+      : a.target.y - b.target.y || a.target.column - b.target.column
+  const sortBySource = (a: (typeof anchored)[0], b: (typeof anchored)[0]) =>
+    vertical
+      ? a.source.x - b.source.x || a.source.column - b.source.column
+      : a.source.y - b.source.y || a.source.column - b.source.column
+
+  for (const l of [...anchored].sort(sortByTarget)) {
+    const p0 = outCursor.get(l.source)!
+    l.a0 = p0
+    l.a1 = p0 + l.value * scale
+    outCursor.set(l.source, l.a1)
   }
-  for (const l of [...anchored].sort((a, b) => a.source.y - b.source.y || a.source.column - b.source.column)) {
-    const y0 = inCursor.get(l.target)!
-    l.ty0 = y0
-    l.ty1 = y0 + l.value * scale
-    inCursor.set(l.target, l.ty1)
+  for (const l of [...anchored].sort(sortBySource)) {
+    const p0 = inCursor.get(l.target)!
+    l.b0 = p0
+    l.b1 = p0 + l.value * scale
+    inCursor.set(l.target, l.b1)
   }
 
   const r = (n: number) => Math.round(n * 100) / 100
   const placedLinks: SankeyLink[] = anchored.map((l) => {
     const thickness = Math.max(l.value * scale, MIN_RIBBON)
-    const sMid = (l.sy0 + l.sy1) / 2
-    const tMid = (l.ty0 + l.ty1) / 2
-    const sy0 = sMid - thickness / 2
-    const sy1 = sMid + thickness / 2
-    const ty0 = tMid - thickness / 2
-    const ty1 = tMid + thickness / 2
+    const sMid = (l.a0 + l.a1) / 2
+    const tMid = (l.b0 + l.b1) / 2
+    const s0 = sMid - thickness / 2
+    const s1 = sMid + thickness / 2
+    const t0 = tMid - thickness / 2
+    const t1 = tMid + thickness / 2
+
+    if (vertical) {
+      const sy = l.source.y + nodeWidth
+      const ty = l.target.y
+      const c1 = sy + (ty - sy) * 0.5
+      const c2 = ty - (ty - sy) * 0.5
+      const path =
+        `M ${r(s0)} ${r(sy)} ` +
+        `C ${r(s0)} ${r(c1)} ${r(t0)} ${r(c2)} ${r(t0)} ${r(ty)} ` +
+        `L ${r(t1)} ${r(ty)} ` +
+        `C ${r(t1)} ${r(c2)} ${r(s1)} ${r(c1)} ${r(s1)} ${r(sy)} Z`
+      return {
+        source: l.source,
+        target: l.target,
+        value: l.value,
+        path,
+        sx: sMid,
+        sy,
+        tx: tMid,
+        ty,
+      }
+    }
+
     const sx = l.source.x + nodeWidth
     const tx = l.target.x
     const c1 = sx + (tx - sx) * 0.5
     const c2 = tx - (tx - sx) * 0.5
     const path =
-      `M ${r(sx)} ${r(sy0)} ` +
-      `C ${r(c1)} ${r(sy0)} ${r(c2)} ${r(ty0)} ${r(tx)} ${r(ty0)} ` +
-      `L ${r(tx)} ${r(ty1)} ` +
-      `C ${r(c2)} ${r(ty1)} ${r(c1)} ${r(sy1)} ${r(sx)} ${r(sy1)} Z`
-    return { source: l.source, target: l.target, value: l.value, path, sx, sy: sMid, tx, ty: tMid }
+      `M ${r(sx)} ${r(s0)} ` +
+      `C ${r(c1)} ${r(s0)} ${r(c2)} ${r(t0)} ${r(tx)} ${r(t0)} ` +
+      `L ${r(tx)} ${r(t1)} ` +
+      `C ${r(c2)} ${r(t1)} ${r(c1)} ${r(s1)} ${r(sx)} ${r(s1)} Z`
+    return {
+      source: l.source,
+      target: l.target,
+      value: l.value,
+      path,
+      sx,
+      sy: sMid,
+      tx,
+      ty: tMid,
+    }
   })
 
-  return { nodes, links: placedLinks, nodeWidth }
+  return { nodes, links: placedLinks, nodeWidth, orientation, width, height }
 }

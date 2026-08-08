@@ -12,6 +12,28 @@ function riseOrder(n: number) {
   return { '--rise-order': n } as CSSProperties
 }
 
+function StatChip({
+  tone,
+  label,
+  value,
+}: {
+  tone: 'ink' | 'clay' | 'accent'
+  label: string
+  value: string
+}) {
+  const dot =
+    tone === 'ink' ? 'bg-ink' : tone === 'clay' ? 'bg-clay' : 'bg-accent'
+  return (
+    <div className="rounded-xl bg-paper/90 px-2.5 py-2 ring-1 ring-line/70 sm:min-w-[5.5rem] sm:px-3">
+      <p className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wide text-ink-faint">
+        <span className={`size-1.5 rounded-full ${dot}`} aria-hidden />
+        {label}
+      </p>
+      <p className="num mt-0.5 text-sm font-semibold tracking-tight text-ink">{value}</p>
+    </div>
+  )
+}
+
 export default function MoneyFlow() {
   const { data, loading, error, refresh } = useHouseholdData()
   const summaries = useMonthlySummary(9)
@@ -116,41 +138,49 @@ export default function MoneyFlow() {
             </div>
           )}
 
-          <section className="rise rounded-card bg-card p-4 shadow-card sm:p-5" style={riseOrder(0)}>
-            <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-              <h2 className="text-sm font-semibold">
-                Where {isViewingCurrentMonth ? "this month's" : `${formatMonth(current.month)}'s`}{' '}
-                money went
-              </h2>
-              <div className="flex gap-4 text-xs text-ink-soft">
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="size-1.5 rounded-full bg-ink" aria-hidden />
-                  In <strong className="num text-ink">{formatMoney(current.combinedIncome)}</strong>
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="size-1.5 rounded-full bg-clay" aria-hidden />
-                  Spent{' '}
-                  <strong className="num text-ink">{formatMoney(current.combinedOutflow)}</strong>
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="size-1.5 rounded-full bg-accent" aria-hidden />
-                  Net wealth{' '}
-                  <strong className="num text-ink">
-                    {formatMoney(current.netWealthChange)}
-                  </strong>
-                </span>
+          <section className="rise overflow-hidden rounded-card bg-card shadow-card" style={riseOrder(0)}>
+            <div className="border-b border-line/80 bg-[linear-gradient(180deg,#ffffff_0%,#faf9f6_100%)] px-4 pb-4 pt-4 sm:px-5 sm:pt-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-faint">
+                    Money map
+                  </p>
+                  <h2 className="mt-1 text-base font-semibold tracking-tight sm:text-[17px]">
+                    Where {isViewingCurrentMonth ? "this month's" : `${formatMonth(current.month)}'s`}{' '}
+                    money went
+                  </h2>
+                </div>
+                <div className="grid grid-cols-3 gap-2 sm:flex sm:gap-3">
+                  <StatChip
+                    tone="ink"
+                    label="In"
+                    value={formatMoney(current.combinedIncome)}
+                  />
+                  <StatChip
+                    tone="clay"
+                    label="Spent"
+                    value={formatMoney(current.combinedOutflow)}
+                  />
+                  <StatChip
+                    tone="accent"
+                    label="Wealth"
+                    value={formatMoney(current.netWealthChange)}
+                  />
+                </div>
               </div>
             </div>
 
-            <FlowSankey summary={current} />
+            <div className="p-3 sm:p-5">
+              <FlowSankey summary={current} />
 
-            {current.completeness.isCardSpendIncomplete && (
-              <p className="mt-3 rounded-xl bg-clay-soft px-3 py-2 text-xs text-clay">
-                {current.completeness.missingStatements.length} card statement
-                {current.completeness.missingStatements.length === 1 ? '' : 's'} not logged for{' '}
-                {formatMonth(current.month)} — the credit card ribbon may be thinner than reality.
-              </p>
-            )}
+              {current.completeness.isCardSpendIncomplete && (
+                <p className="mt-3 rounded-xl bg-clay-soft px-3 py-2 text-xs text-clay">
+                  {current.completeness.missingStatements.length} card statement
+                  {current.completeness.missingStatements.length === 1 ? '' : 's'} not logged for{' '}
+                  {formatMonth(current.month)} — the credit card ribbon may be thinner than reality.
+                </p>
+              )}
+            </div>
           </section>
 
           <section className="rise rounded-card bg-card p-4 shadow-card sm:p-5" style={riseOrder(1)}>
