@@ -1,6 +1,13 @@
 import type { HouseholdData, Owner } from '../types/db'
 import { OWNERS } from '../types/db'
-import { formatMonthShort, monthKey, monthlyAmount, monthStart, parseDate } from './money'
+import {
+  formatMonthShort,
+  monthKey,
+  monthKeyFromTimestamp,
+  monthlyAmount,
+  monthStart,
+  parseDate,
+} from './money'
 
 export interface OwnerSummary {
   income: number
@@ -111,12 +118,13 @@ export interface MonthlySummary {
  * Assumptions:
  * - Recurring income/fixed items reflect the *current* setup and are applied
  *   uniformly across months (the schema keeps no change history).
- * - `one_time` income counts fully in the month it was entered (created_at).
+ * - Biweekly amounts use × 2 (typical month with two paychecks).
+ * - `one_time` income counts fully in the local calendar month of created_at.
  * - Card statements count toward the month their closing date falls in.
  * - `card_statements.balance` = new charges (purchases + fees & interest),
  *   NOT the "New Balance" figure printed on the statement.
  * - Fixed expenses with `paid_via_card_id` set are netted out of that card's
- *   statement total to prevent double-counting. The net is clamped to ≥ 0.
+ *   statement total once per card per month. The net is clamped to ≥ 0.
  */
 export function computeMonthSummary(data: HouseholdData, month: Date): MonthlySummary {
   const key = monthKey(month)
@@ -131,12 +139,16 @@ export function computeMonthSummary(data: HouseholdData, month: Date): MonthlySu
   const autoSavings: Record<Owner, number> = { ammar: 0, fiancee: 0 }
   for (const s of activeIncome) {
     if (s.frequency === 'one_time') {
-      if (monthKey(parseDate(s.created_at)) === key) {
+      // created_at is a timestamp — use local month of the instant, not
+      // parseDate (which treats date-only strings as local midnight and
+      // would mis-bucket UTC midnights near month boundaries).
+      if (monthKeyFromTimestamp(s.created_at) === key) {
         income[s.owner] += s.amount
         autoSavings[s.owner] += s.auto_savings_amount
       }
     } else {
       income[s.owner] += monthlyAmount(s.amount, s.frequency)
+      // auto_savings is "per paycheck" — same frequency as the pay amount.
       autoSavings[s.owner] += monthlyAmount(s.auto_savings_amount, s.frequency)
     }
   }
@@ -193,18 +205,31 @@ export function computeMonthSummary(data: HouseholdData, month: Date): MonthlySu
   // cardSpendGross: raw sum of new charges logged for each card this month.
   const cardSpendGross: Record<Owner, number> = { ammar: 0, fiancee: 0 }
   // cardFixedOverlap: sum of fixed-item overlap for each owner's cards.
+  // Applied once per card per month (not once per statement row) so two
+  // closing dates in the same calendar month don't double-net bills.
   const cardFixedOverlapByOwner: Record<Owner, number> = { ammar: 0, fiancee: 0 }
 
   // Which cards have a statement this month (for completeness check).
   const cardsWithStatement = new Set<string>()
+  // Gross charges accumulated per card this month.
+  const cardGrossThisMonth = new Map<string, number>()
 
   for (const st of data.cardStatements) {
     if (monthKey(parseDate(st.statement_date)) !== key) continue
     const owner = cardOwner.get(st.card_id)
     if (!owner) continue
     cardsWithStatement.add(st.card_id)
-    cardSpendGross[owner] += st.balance
-    cardFixedOverlapByOwner[owner] += cardOverlap.get(st.card_id) ?? 0
+    cardGrossThisMonth.set(
+      st.card_id,
+      (cardGrossThisMonth.get(st.card_id) ?? 0) + st.balance,
+    )
+  }
+
+  for (const [cardId, gross] of cardGrossThisMonth) {
+    const owner = cardOwner.get(cardId)
+    if (!owner) continue
+    cardSpendGross[owner] += gross
+    cardFixedOverlapByOwner[owner] += cardOverlap.get(cardId) ?? 0
   }
 
   // Net card spend: gross minus overlap, clamped to 0 (annual bills or

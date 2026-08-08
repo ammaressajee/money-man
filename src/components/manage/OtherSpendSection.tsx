@@ -69,8 +69,8 @@ function OwnerOtherSpend({ owner }: { owner: Owner }) {
   }
 
   return (
-    <section className="rounded-card bg-card p-4 shadow-card">
-      <h3 className="text-sm font-bold">{OWNER_LABELS[owner]}</h3>
+    <section className="surface p-4">
+      <h3 className="text-sm font-semibold">{OWNER_LABELS[owner]}</h3>
       <form
         onSubmit={onSubmit}
         className="mt-3 grid grid-cols-1 items-end gap-2 sm:grid-cols-[1fr_1fr_1.2fr_auto]"

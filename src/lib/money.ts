@@ -2,6 +2,11 @@ import type { FixedFrequency, IncomeFrequency } from '../types/db'
 
 /**
  * Normalize a recurring amount to a monthly figure.
+ *
+ * Biweekly uses × 2 (two paychecks in a typical calendar month). Using
+ * 26/12 would inflate most months by ~8% for the two “third paycheck”
+ * months that only happen twice a year — wrong for a month snapshot.
+ *
  * One-time amounts return 0 here — they are counted only in the month
  * they were entered (see summary.ts).
  */
@@ -13,12 +18,21 @@ export function monthlyAmount(
     case 'monthly':
       return amount
     case 'biweekly':
-      return (amount * 26) / 12
+      return amount * 2
     case 'annual':
       return amount / 12
     case 'one_time':
       return 0
   }
+}
+
+/**
+ * Calendar month for a created_at / timestamp string.
+ * Uses the local calendar month of the instant so “entered this month”
+ * matches when the user hit Save (not a UTC-midnight shift).
+ */
+export function monthKeyFromTimestamp(s: string): string {
+  return monthKey(new Date(s))
 }
 
 const currency = new Intl.NumberFormat('en-US', {

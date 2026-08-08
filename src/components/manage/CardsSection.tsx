@@ -29,9 +29,11 @@ export function CardsSection() {
         const ownerCards = cards.filter((c) => c.owner === owner)
         return (
           <section key={owner}>
-            <h3 className="mb-2 text-sm font-semibold text-ink-soft">{OWNER_LABELS[owner]}</h3>
+            <h3 className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-ink-faint">
+              {OWNER_LABELS[owner]}
+            </h3>
             {ownerCards.length === 0 && (
-              <p className="rounded-xl border border-dashed border-line px-4 py-3 text-sm text-ink-faint">
+              <p className="rounded-xl border border-dashed border-line/80 px-4 py-3 text-sm text-ink-faint">
                 No cards yet
               </p>
             )}
@@ -122,9 +124,9 @@ function CardBlock({ card, fixedItems }: { card: CreditCard; fixedItems: FixedIt
     parsedCharges === 0 && autopaidItems.length > 0
 
   return (
-    <div className="rounded-card bg-card p-4 shadow-card">
+    <div className="surface p-4">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-bold">{card.name}</h4>
+        <h4 className="text-sm font-semibold">{card.name}</h4>
         <button onClick={() => void removeCard()} disabled={busy} className={`${btnDanger} -mr-2 px-2 py-1 text-xs`}>
           Remove
         </button>
@@ -250,7 +252,7 @@ function AddCardForm({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 rounded-card bg-card p-4 shadow-card">
+    <form onSubmit={onSubmit} className="space-y-4 surface p-4">
       <Field label="Card name">
         <TextInput
           required

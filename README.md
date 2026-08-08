@@ -101,7 +101,8 @@ flowchart TB
 
 ## How the numbers work
 
-- Everything is normalized to monthly: biweekly × 26⁄12, annual ÷ 12.
+- Everything is normalized to monthly: biweekly × 2 (two paychecks in a
+  typical month), annual ÷ 12.
 - Joint costs are split **proportionally to each partner's income**, recomputed
   live from entered income — not a hardcoded 50/50.
 - Wealth-building fixed items come in three kinds, each tracked separately on

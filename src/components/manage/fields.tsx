@@ -5,7 +5,7 @@ export const btnPrimary =
 export const btnGhost =
   'rounded-xl px-4 py-2.5 text-sm font-semibold text-ink-soft transition-colors hover:text-ink'
 export const btnDanger =
-  'rounded-xl px-4 py-2.5 text-sm font-semibold text-danger transition-colors hover:bg-clay-soft'
+  'rounded-xl px-3 py-1.5 text-xs font-semibold text-danger transition-colors hover:bg-clay-soft'
 
 // 16px input text — anything smaller makes iOS Safari zoom the page on focus.
 const inputClass =

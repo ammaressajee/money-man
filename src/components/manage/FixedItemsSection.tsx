@@ -28,13 +28,15 @@ export function FixedItemsSection() {
   return (
     <div className="space-y-5">
       {items.length === 0 && (
-        <p className="rounded-xl border border-dashed border-line px-4 py-3 text-sm text-ink-faint">
+        <p className="rounded-xl border border-dashed border-line/80 px-4 py-3 text-sm text-ink-faint">
           No fixed items yet — rent, subscriptions, car note, Roth IRA…
         </p>
       )}
       {categories.map((category) => (
         <section key={category}>
-          <h3 className="mb-2 text-sm font-semibold text-ink-soft">{category}</h3>
+          <h3 className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-ink-faint">
+            {category}
+          </h3>
           <ul className="space-y-2">
             {items
               .filter((f) => f.category === category)
@@ -47,9 +49,7 @@ export function FixedItemsSection() {
                   <li key={f.id}>
                     <button
                       onClick={() => setEditingId(f.id)}
-                      className={`flex w-full items-center justify-between gap-3 rounded-xl bg-card px-4 py-3 text-left shadow-card transition-shadow hover:shadow-card-lg ${
-                        f.active ? '' : 'opacity-50'
-                      }`}
+                      className={`list-row ${f.active ? '' : 'opacity-50'}`}
                     >
                       <span>
                         <span className="flex items-center gap-2 text-sm font-semibold">
@@ -94,7 +94,7 @@ const KIND_DOTS: Record<Exclude<FixedKind, 'expense'>, string> = {
 function KindBadge({ kind }: { kind: FixedKind }) {
   if (kind === 'expense') return null
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent">
+    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-accent">
       <span className={`size-1.5 rounded-full ${KIND_DOTS[kind]}`} aria-hidden />
       {KIND_LABELS[kind]}
     </span>
@@ -155,7 +155,7 @@ function FixedItemForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 rounded-card bg-card p-4 shadow-card">
+    <form onSubmit={onSubmit} className="space-y-4 surface p-4">
       <Field label="Name">
         <TextInput
           required

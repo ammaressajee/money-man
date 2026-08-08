@@ -22,8 +22,9 @@ export function MonthlyFlowCard({
   const overspent = leftover < 0
   const hasDrawdown = summary.savingsDraw > 0
 
-  // When spending + saving exceeds income, scale bars to the larger total
-  // so nothing overflows the card.
+  // Stack uses effective cash savings (after any draw) so segment widths
+  // never exceed the denominator when overspent.
+  const stackSaving = Math.max(0, summary.effectiveSaving)
   const denom = Math.max(income, spend + saved, 1)
   const pctOfIncome = (n: number) => (income > 0 ? n / income : 0)
   const width = (n: number) => `${Math.max(0, (n / denom) * 100)}%`
@@ -35,28 +36,23 @@ export function MonthlyFlowCard({
 
   const segments = [
     { key: 'spend', amount: spend, className: 'bg-clay' },
-    { key: 'saving', amount: summary.totalSaving, className: 'bg-save' },
+    { key: 'saving', amount: stackSaving, className: hasDrawdown ? 'bg-danger' : 'bg-save' },
     { key: 'investing', amount: summary.totalInvesting, className: 'bg-invest' },
     { key: 'retirement', amount: summary.totalRetirement, className: 'bg-retire' },
   ].filter((s) => s.amount > 0)
 
   return (
-    <section className="rise rounded-card bg-card p-5 shadow-card" style={style}>
-      <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-sm font-semibold">This month's flow</h2>
-        <p className="text-xs text-ink-faint">% of income</p>
-      </div>
+    <section className="rise surface-pad" style={style}>
+      <h2 className="section-title">This month&apos;s flow</h2>
 
-      {/* Headline: in vs out vs saved */}
-      <div className="mt-3 grid grid-cols-3 gap-2 rounded-xl border border-line bg-paper/60 px-3 py-2.5">
+      <div className="mt-4 grid grid-cols-3 gap-3">
         <HeadlineStat label="In" value={income} />
         <HeadlineStat label="Out" value={spend} />
         <HeadlineStat label="Saved" value={saved} accent />
       </div>
 
-      {/* Composition bar: how income splits */}
       <div
-        className="mt-4 flex h-3 w-full gap-px overflow-hidden rounded-full bg-paper"
+        className="mt-5 flex h-2.5 w-full gap-px overflow-hidden rounded-full bg-paper"
         role="img"
         aria-label={`Of ${formatMoney(income)} income: ${formatMoney(spend)} spent, ${formatMoney(saved)} saved, ${formatMoney(leftover)} left over`}
       >
@@ -71,7 +67,7 @@ export function MonthlyFlowCard({
         )}
       </div>
 
-      <div className="mt-4 space-y-3.5">
+      <div className="mt-5 space-y-4">
         <FlowRow
           label="Spending"
           amount={spend}
@@ -99,7 +95,7 @@ export function MonthlyFlowCard({
           detail={
             hasDrawdown
               ? `Below ${formatMoney(summary.totalSaving)} planned · −${formatMoney(summary.savingsDraw)} covered shortfall`
-              : 'Cash — incl. paycheck auto-transfers'
+              : undefined
           }
           danger={hasDrawdown}
         />
@@ -109,7 +105,6 @@ export function MonthlyFlowCard({
           pct={pctOfIncome(summary.totalInvesting)}
           barWidth={width(summary.totalInvesting)}
           barClass="bg-invest"
-          detail="Brokerage & taxable investing"
         />
         <FlowRow
           label="Retirement"
@@ -117,20 +112,19 @@ export function MonthlyFlowCard({
           pct={pctOfIncome(summary.totalRetirement)}
           barWidth={width(summary.totalRetirement)}
           barClass="bg-retire"
-          detail="Roth IRA, 401(k), HSA…"
         />
         <FlowRow
           label={overspent ? 'Overspent by' : 'Leftover'}
           amount={Math.abs(leftover)}
           pct={pctOfIncome(Math.abs(leftover))}
           barWidth={width(Math.abs(leftover))}
-          barClass={overspent ? 'bg-danger' : 'bg-ink-faint/50'}
+          barClass={overspent ? 'bg-danger' : 'bg-ink-faint/40'}
           detail={
             overspent
               ? hasDrawdown
-                ? 'Shortfall covered from savings — see net wealth above'
-                : 'Out + saved exceeds income this month'
-              : 'Unallocated cash in checking'
+                ? 'Shortfall covered from savings'
+                : 'Out + saved exceeds income'
+              : undefined
           }
           danger={overspent}
         />
@@ -141,9 +135,9 @@ export function MonthlyFlowCard({
 
 function HeadlineStat({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
   return (
-    <div className="min-w-0 text-center">
-      <p className="text-[11px] font-medium uppercase tracking-wide text-ink-faint">{label}</p>
-      <p className={`num mt-0.5 truncate text-[15px] font-bold ${accent ? 'text-accent' : ''}`}>
+    <div className="min-w-0">
+      <p className="text-[11px] font-medium text-ink-faint">{label}</p>
+      <p className={`num mt-1 truncate text-base font-bold tracking-tight ${accent ? 'text-accent' : ''}`}>
         {formatMoney(value)}
       </p>
     </div>
@@ -178,14 +172,14 @@ function FlowRow({
           )}
         </span>
       </div>
-      <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-paper" aria-hidden>
+      <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-paper" aria-hidden>
         <div
           className={`h-full rounded-full ${barClass} transition-[width] duration-700`}
           style={{ width: barWidth }}
         />
       </div>
       {detail && (
-        <p className={`mt-1 text-[11px] ${danger ? 'text-danger/75' : 'text-ink-faint'}`}>
+        <p className={`mt-1 text-[11px] leading-snug ${danger ? 'text-danger/75' : 'text-ink-faint'}`}>
           {detail}
         </p>
       )}

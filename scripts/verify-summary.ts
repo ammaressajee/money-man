@@ -38,10 +38,10 @@ const data: HouseholdData = {
 
 const s = computeMonthSummary(data, new Date(now.getFullYear(), now.getMonth(), 1))
 
-const ammarIncome = (2600 * 26) / 12 // 5633.33
+const ammarIncome = 2600 * 2 // biweekly → 2 paychecks/month
 const combined = ammarIncome + 3000
 const ratio = ammarIncome / combined
-const ammarAutoSavings = (300 * 26) / 12 // 650
+const ammarAutoSavings = 300 * 2 // 600
 const internetMonthly = 60
 
 // c1 gross = 400; overlap = 60 (Internet autopays on c1); net = 340
@@ -157,10 +157,10 @@ console.log(`${refundNetOk   ? 'PASS' : 'FAIL'}  refund cycle: net clamped to 0`
 // ─── Overdraft / savings-draw check ─────────────────────────────────────────
 // A month where card spend is so high that spend + planned wealth > income.
 // We add a massive card statement to force a shortfall.
-// Income (combined) = ammarIncome + 3000 ≈ 8633
-// Planned wealth = expectedWealth ≈ ammarAutoSavings(650) + HYSA(100) + indexFunds(250) + roth(500) = 1500
+// Income (combined) = ammarIncome + 3000 = 8200
+// Planned wealth = expectedWealth = ammarAutoSavings(600) + HYSA(100) + indexFunds(250) + roth(500) = 1450
 // Fixed spend = jointExpected(1060) + carNote(200) = 1260
-// To cause shortfall we need card spend > income - wealth - fixedSpend = 8633 - 1500 - 1260 = 5873
+// To cause shortfall we need card spend > income - wealth - fixedSpend = 8200 - 1450 - 1260 = 5490
 // Use 7000 gross on c1 (overlap still 60, so net = 6940)
 const dataOverdraft: HouseholdData = {
   ...data,
@@ -193,6 +193,59 @@ for (const [name, actual, expected] of odChecks) {
   if (!ok) failed++
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}: got ${actual.toFixed(4)}, expected ${expected.toFixed(4)}`)
 }
+
+// ─── Multi-statement overlap: net once per card per month ───────────────────
+const dataMultiStmt: HouseholdData = {
+  ...data,
+  cardStatements: [
+    { id: 'ms1', card_id: 'c1', statement_date: `${thisMonth}-05`, balance: 200, created_at: '2026-01-01T00:00:00Z' },
+    { id: 'ms2', card_id: 'c1', statement_date: `${thisMonth}-25`, balance: 200, created_at: '2026-01-01T00:00:00Z' },
+  ],
+}
+const sMulti = computeMonthSummary(dataMultiStmt, new Date(now.getFullYear(), now.getMonth(), 1))
+const multiGrossOk = sMulti.ammar.cardSpendGross === 400
+const multiOverlapOk = sMulti.ammar.cardFixedOverlap === internetMonthly // once, not 2×
+const multiNetOk = sMulti.ammar.cardSpend === 400 - internetMonthly
+
+console.log('\n── Multi-statement overlap ──')
+for (const [name, ok, detail] of [
+  ['gross sums both statements', multiGrossOk, `got ${sMulti.ammar.cardSpendGross}`],
+  ['overlap applied once (not ×2)', multiOverlapOk, `got ${sMulti.ammar.cardFixedOverlap}`],
+  ['net = gross − single overlap', multiNetOk, `got ${sMulti.ammar.cardSpend}`],
+] as [string, boolean, string][]) {
+  if (!ok) failed++
+  console.log(`${ok ? 'PASS' : 'FAIL'}  ${name} (${detail})`)
+}
+
+// ─── Biweekly auto-savings = 2× per paycheck ────────────────────────────────
+const dataBiweekly: HouseholdData = {
+  ...data,
+  incomeSources: [
+    {
+      id: 'bw1',
+      owner: 'ammar',
+      label: 'Pay',
+      amount: 2000,
+      frequency: 'biweekly',
+      auto_savings_amount: 400,
+      active: true,
+      created_at: '2026-01-01T12:00:00Z',
+    },
+  ],
+  fixedItems: [],
+  creditCards: [],
+  cardStatements: [],
+  otherSpend: [],
+}
+const sBw = computeMonthSummary(dataBiweekly, new Date(now.getFullYear(), now.getMonth(), 1))
+const bwIncomeOk = Math.abs(sBw.ammar.income - 4000) < 0.01
+const bwSaveOk = Math.abs(sBw.ammar.saving - 800) < 0.01
+
+console.log('\n── Biweekly normalization ──')
+console.log(`${bwIncomeOk ? 'PASS' : 'FAIL'}  $2000 biweekly pay → $4000/mo (got ${sBw.ammar.income})`)
+console.log(`${bwSaveOk ? 'PASS' : 'FAIL'}  $400/pay auto-save → $800/mo (got ${sBw.ammar.saving})`)
+if (!bwIncomeOk) failed++
+if (!bwSaveOk) failed++
 
 console.log(failed === 0 ? '\nAll checks passed.' : `\n${failed} check(s) FAILED.`)
 process.exit(failed === 0 ? 0 : 1)

@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import type { IncomeFrequency, IncomeSource, Owner } from '../../types/db'
 import { OWNERS, OWNER_LABELS } from '../../types/db'
-import { formatMoneyExact } from '../../lib/money'
+import { formatMoneyExact, monthlyAmount } from '../../lib/money'
 import { useHouseholdData } from '../../hooks/useHouseholdData'
 import {
   btnGhost,
@@ -35,9 +35,11 @@ export function IncomeSection() {
         const rows = sources.filter((s) => s.owner === owner)
         return (
           <section key={owner}>
-            <h3 className="mb-2 text-sm font-semibold text-ink-soft">{OWNER_LABELS[owner]}</h3>
+            <h3 className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-ink-faint">
+              {OWNER_LABELS[owner]}
+            </h3>
             {rows.length === 0 && (
-              <p className="rounded-xl border border-dashed border-line px-4 py-3 text-sm text-ink-faint">
+              <p className="rounded-xl border border-dashed border-line/80 px-4 py-3 text-sm text-ink-faint">
                 No income yet
               </p>
             )}
@@ -51,20 +53,25 @@ export function IncomeSection() {
                   <li key={s.id}>
                     <button
                       onClick={() => setEditingId(s.id)}
-                      className={`flex w-full items-center justify-between gap-3 rounded-xl bg-card px-4 py-3 text-left shadow-card transition-shadow hover:shadow-card-lg ${
-                        s.active ? '' : 'opacity-50'
-                      }`}
+                      className={`list-row ${s.active ? '' : 'opacity-50'}`}
                     >
                       <span>
                         <span className="block text-sm font-semibold">{s.label}</span>
                         <span className="block text-xs text-ink-soft">
                           {FREQUENCY_LABELS[s.frequency]}
                           {s.auto_savings_amount > 0 &&
-                            ` · ${formatMoneyExact(s.auto_savings_amount)} auto-saved`}
+                            ` · ${formatMoneyExact(s.auto_savings_amount)}/pay → ${formatMoneyExact(monthlyAmount(s.auto_savings_amount, s.frequency))}/mo`}
                           {!s.active && ' · Inactive'}
                         </span>
                       </span>
-                      <span className="num text-sm font-bold">{formatMoneyExact(s.amount)}</span>
+                      <span className="text-right">
+                        <span className="num block text-sm font-bold">{formatMoneyExact(s.amount)}</span>
+                        {s.frequency !== 'monthly' && s.frequency !== 'one_time' && (
+                          <span className="num block text-[11px] text-ink-faint">
+                            {formatMoneyExact(monthlyAmount(s.amount, s.frequency))}/mo
+                          </span>
+                        )}
+                      </span>
                     </button>
                   </li>
                 ),
@@ -97,6 +104,12 @@ function IncomeForm({ initial, onDone }: { initial?: IncomeSource; onDone: () =>
   )
   const [invalid, setInvalid] = useState<string | null>(null)
 
+  const parsedAuto = parseMoney(autoSavings)
+  const monthlyAuto =
+    parsedAuto !== null && frequency !== 'one_time'
+      ? monthlyAmount(parsedAuto, frequency)
+      : parsedAuto
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
     const amt = parseMoney(amount)
@@ -125,7 +138,7 @@ function IncomeForm({ initial, onDone }: { initial?: IncomeSource; onDone: () =>
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 rounded-card bg-card p-4 shadow-card">
+    <form onSubmit={onSubmit} className="space-y-4 surface p-4">
       <Field label="Who">
         <Segmented
           ariaLabel="Income owner"
@@ -159,9 +172,17 @@ function IncomeForm({ initial, onDone }: { initial?: IncomeSource; onDone: () =>
           </SelectInput>
         </Field>
       </div>
-      <Field label="Auto-saved per paycheck">
+      <Field label={frequency === 'monthly' ? 'Auto-saved per month' : 'Auto-saved per paycheck'}>
         <MoneyInput value={autoSavings} onChange={(e) => setAutoSavings(e.target.value)} />
       </Field>
+      {monthlyAuto !== null && monthlyAuto > 0 && frequency !== 'monthly' && frequency !== 'one_time' && (
+        <p className="text-xs text-ink-soft">
+          Counts as{' '}
+          <span className="num font-semibold text-ink">{formatMoneyExact(monthlyAuto)}/mo</span>
+          {frequency === 'biweekly' ? ' (2 paychecks × amount)' : null}
+          {frequency === 'annual' ? ' (annual ÷ 12)' : null}
+        </p>
+      )}
       <FormError message={invalid ?? error} />
       <div className="flex items-center justify-between">
         {initial ? (

@@ -11,18 +11,16 @@ export function MoneyFlowDiagram({ summary }: { summary?: MonthlySummary }) {
   const fianceeShare = summary ? formatPercent(summary.fiancee.incomeRatio) : null
 
   return (
-    <div className="space-y-5" aria-label="How money flows through your household">
-      {/* Personal columns */}
+    <div className="space-y-6" aria-label="How money flows through your household">
       <div className="grid gap-4 sm:grid-cols-2">
         <PersonColumn name="Ammar" summary={summary?.ammar} shareLabel={ammarShare} />
         <PersonColumn name="Bethany" summary={summary?.fiancee} shareLabel={fianceeShare} />
       </div>
 
-      {/* Converge into joint */}
       <div className="relative flex flex-col items-center gap-2">
-        <div className="flex w-full items-center gap-2 px-2" aria-hidden>
+        <div className="flex w-full items-center gap-3 px-1" aria-hidden>
           <span className="h-px flex-1 bg-line" />
-          <span className="text-[11px] font-medium uppercase tracking-wide text-ink-faint">
+          <span className="text-[11px] font-medium text-ink-faint">
             share ∝ income
             {ammarShare && fianceeShare ? ` · ${ammarShare} / ${fianceeShare}` : ''}
           </span>
@@ -40,15 +38,12 @@ export function MoneyFlowDiagram({ summary }: { summary?: MonthlySummary }) {
           large
         />
         <FlowArrow />
-        <div className="flex w-full flex-wrap justify-center gap-2">
-          <Chip tone="spend">Rent</Chip>
-          <Chip tone="spend">Utilities</Chip>
-          <Chip tone="spend">Shared subs</Chip>
-        </div>
+        <p className="text-center text-xs text-ink-soft">
+          Rent · Utilities · Shared subscriptions
+        </p>
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap gap-x-4 gap-y-1.5 border-t border-line pt-4 text-xs text-ink-soft">
+      <div className="flex flex-wrap gap-x-5 gap-y-1.5 border-t border-line pt-4 text-xs text-ink-soft">
         <LegendDot className="bg-accent" label="Wealth-building" />
         <LegendDot className="bg-clay" label="Spending" />
         <LegendDot className="bg-ink-faint" label="Account" />
@@ -69,8 +64,8 @@ function PersonColumn({
   const money = (n?: number) => (n !== undefined ? `${formatMoney(n)}/mo` : undefined)
 
   return (
-    <div className="rounded-2xl border border-line bg-paper/60 p-3.5">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">{name}</p>
+    <div className="rounded-xl bg-paper/50 p-3.5 ring-1 ring-line/80">
+      <p className="mb-3 text-xs font-semibold tracking-wide text-ink-soft">{name}</p>
 
       <Inflow label="Paycheck" amount={money(summary?.income)} />
       <FlowArrow />
@@ -95,7 +90,7 @@ function PersonColumn({
           <MiniArrow />
           <AccountNode
             title="Retirement"
-            subtitle={money(summary?.retirement) ?? 'Roth IRA · 401(k)'}
+            subtitle={money(summary?.retirement) ?? 'Roth · 401(k)'}
             tone="wealth"
             compact
           />
@@ -124,7 +119,7 @@ function PersonColumn({
 
 function Inflow({ label, amount }: { label: string; amount?: string }) {
   return (
-    <div className="rounded-xl bg-solid px-3 py-2.5 text-center text-ink ring-1 ring-line">
+    <div className="rounded-lg bg-solid px-3 py-2.5 text-center text-ink ring-1 ring-line">
       <p className="text-[11px] font-medium text-ink-soft">{label}</p>
       {amount && <p className="num mt-0.5 text-sm font-bold">{amount}</p>}
     </div>
@@ -145,31 +140,19 @@ function AccountNode({
   large?: boolean
 }) {
   const tones = {
-    account: 'border-line bg-card text-ink',
-    wealth: 'border-accent/25 bg-accent-soft text-accent',
-    spend: 'border-clay/25 bg-clay-soft text-clay',
+    account: 'bg-card text-ink ring-1 ring-line',
+    wealth: 'bg-accent-soft text-accent',
+    spend: 'bg-clay-soft text-clay',
   }
   return (
     <div
-      className={`w-full rounded-xl border text-center ${tones[tone]} ${
-        compact ? 'px-2 py-2' : large ? 'px-4 py-3.5 shadow-card' : 'px-3 py-2.5'
+      className={`w-full rounded-lg text-center ${tones[tone]} ${
+        compact ? 'px-2 py-2' : large ? 'px-4 py-3.5' : 'px-3 py-2.5'
       }`}
     >
       <p className={`font-semibold leading-tight ${compact ? 'text-xs' : 'text-sm'}`}>{title}</p>
       {subtitle && <p className="mt-0.5 text-[11px] opacity-70">{subtitle}</p>}
     </div>
-  )
-}
-
-function Chip({ children, tone }: { children: string; tone: 'spend' | 'wealth' }) {
-  return (
-    <span
-      className={`rounded-full px-3 py-1 text-xs font-medium ${
-        tone === 'spend' ? 'bg-clay-soft text-clay' : 'bg-accent-soft text-accent'
-      }`}
-    >
-      {children}
-    </span>
   )
 }
 
@@ -208,7 +191,7 @@ function MiniArrow() {
 function LegendDot({ className, label }: { className: string; label: string }) {
   return (
     <span className="inline-flex items-center gap-1.5">
-      <span className={`size-2 rounded-full ${className}`} aria-hidden />
+      <span className={`size-1.5 rounded-full ${className}`} aria-hidden />
       {label}
     </span>
   )

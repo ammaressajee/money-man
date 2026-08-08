@@ -27,20 +27,20 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-paper px-4">
+    <div className="flex min-h-dvh items-center justify-center px-4 py-10">
       <div className="rise w-full max-w-sm">
-        <div className="mb-8 flex justify-center">
+        <div className="mb-10 flex justify-center">
           <Wordmark size="hero" />
         </div>
         <form
           onSubmit={onSubmit}
-          className="rounded-card bg-card p-6 shadow-card"
+          className="surface-pad"
           aria-label="Sign in"
         >
           <h1 className="text-lg font-bold tracking-tight">Welcome back</h1>
           <p className="mt-1 text-sm text-ink-soft">Sign in to your shared household account.</p>
 
-          <label className="mt-5 block text-sm font-medium" htmlFor="email">
+          <label className="mt-6 block text-sm font-medium" htmlFor="email">
             Email
           </label>
           <input

@@ -22,12 +22,15 @@ const BreakdownChart = lazy(() =>
 )
 
 function ChartFallback() {
-  return <div className="h-52 animate-pulse rounded-xl bg-paper" aria-hidden />
+  return <div className="h-48 animate-pulse rounded-xl bg-paper" aria-hidden />
 }
 
 export default function Dashboard() {
   const { data, loading, error, refresh } = useHouseholdData()
-  const summaries = useMonthlySummary(9)
+  // At least the full calendar year so YTD isn't truncated after September,
+  // and keep 9 months of history early in the year for the trend chart.
+  const monthsBack = Math.max(9, new Date().getMonth() + 1)
+  const summaries = useMonthlySummary(monthsBack)
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
 
   useEffect(() => {
@@ -57,7 +60,7 @@ export default function Dashboard() {
   const setup = data ? computeSetupStatus(data, monthKey(new Date())) : null
 
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-xl px-4 pb-10 pt-5">
+    <div className="page page-narrow">
       <h1 className="sr-only">
         {current ? `${formatMonth(current.month)} snapshot` : 'Dashboard'}
       </h1>
@@ -66,8 +69,8 @@ export default function Dashboard() {
       {loading && <DashboardSkeleton />}
 
       {!loading && error && (
-        <div className="rise rounded-card bg-card p-6 text-center shadow-card">
-          <p className="font-semibold">Couldn't load your data</p>
+        <div className="rise surface-pad text-center">
+          <p className="font-semibold">Couldn&apos;t load your data</p>
           <p className="mt-1 text-sm text-ink-soft">{error}</p>
           <button
             onClick={() => void refresh()}
@@ -83,23 +86,23 @@ export default function Dashboard() {
       )}
 
       {!loading && !error && setup?.isDashboardReady && current && (
-        <main className="space-y-4">
+        <main className="space-y-6">
           {summaries.length > 1 && (
-            <div className="flex items-center justify-between">
+            <div className="month-nav">
               <button
                 onClick={() => goMonth(-1)}
                 disabled={resolvedIndex === 0}
                 aria-label="Previous month"
-                className="rounded-lg px-2.5 py-1.5 text-sm font-medium text-ink-soft transition-colors hover:bg-paper hover:text-ink disabled:pointer-events-none disabled:opacity-30"
+                className="month-nav-btn"
               >
                 ← Prev
               </button>
-              <p className="text-sm font-semibold">{formatMonth(current.month)}</p>
+              <p className="month-nav-label">{formatMonth(current.month)}</p>
               <button
                 onClick={() => goMonth(1)}
                 disabled={isViewingCurrentMonth}
                 aria-label="Next month"
-                className="rounded-lg px-2.5 py-1.5 text-sm font-medium text-ink-soft transition-colors hover:bg-paper hover:text-ink disabled:pointer-events-none disabled:opacity-30"
+                className="month-nav-btn"
               >
                 Next →
               </button>
@@ -127,68 +130,47 @@ export default function Dashboard() {
 
           <Link
             to="/flow"
-            className="rise block rounded-card bg-card p-5 shadow-card transition-[box-shadow] hover:shadow-card-lg"
+            className="rise group flex items-center justify-between gap-3 border-y border-line py-4 transition-colors hover:border-accent/40"
             style={riseOrder(5)}
           >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h2 className="text-sm font-semibold">How money flows</h2>
-                <p className="mt-0.5 text-xs text-ink-soft">
-                  Accounts, paychecks, joint share — the full picture
-                </p>
-              </div>
-              <span className="text-sm font-medium text-accent" aria-hidden>
-                View →
-              </span>
+            <div>
+              <h2 className="section-title group-hover:text-accent">How money flows</h2>
+              <p className="section-hint">Accounts, paychecks, and joint share</p>
             </div>
-            <div className="mt-4 flex gap-2" aria-hidden>
-              <span className="rounded-full bg-solid px-2.5 py-1 text-[11px] font-medium text-ink ring-1 ring-line">
-                Paycheck
-              </span>
-              <span className="rounded-full bg-accent-soft px-2.5 py-1 text-[11px] font-medium text-accent">
-                Wealth
-              </span>
-              <span className="rounded-full bg-clay-soft px-2.5 py-1 text-[11px] font-medium text-clay">
-                Spend
-              </span>
-              <span className="rounded-full border border-line bg-paper px-2.5 py-1 text-[11px] font-medium text-ink-soft">
-                Joint
-              </span>
-            </div>
+            <span className="text-sm font-medium text-accent" aria-hidden>
+              View →
+            </span>
           </Link>
 
-          <section className="rise rounded-card bg-card p-5 shadow-card" style={riseOrder(6)}>
-            <h2 className="text-sm font-semibold">Spending trend</h2>
-            <p className="mb-3 text-xs text-ink-soft">
-              Logged card and debit spend by month.{' '}
-              <span className="italic">
-                Dashed lines use today's recurring income and investing for every month.
-              </span>
+          <section className="rise surface-pad" style={riseOrder(6)}>
+            <h2 className="section-title">Spending trend</h2>
+            <p className="section-hint mb-4">
+              Card and debit spend by month. Dashed lines use today&apos;s recurring setup.
             </p>
             <Suspense fallback={<ChartFallback />}>
               <TrendChart summaries={summaries} selectedKey={current.key} />
             </Suspense>
           </section>
 
-          <section className="rise rounded-card bg-card p-5 shadow-card" style={riseOrder(7)}>
-            <h2 className="text-sm font-semibold">
-              Where {isViewingCurrentMonth ? "this month's" : `${formatMonth(current.month)}`} spending went
+          <section className="rise surface-pad" style={riseOrder(7)}>
+            <h2 className="section-title">
+              Where {isViewingCurrentMonth ? "this month's" : `${formatMonth(current.month)}`}{' '}
+              spending went
             </h2>
-            <p className="mb-3 text-xs text-ink-soft">
-              Macro categories only — investing isn't spend, so it's not here
-            </p>
+            <p className="section-hint mb-4">Macro categories — investing isn&apos;t spend</p>
             <Suspense fallback={<ChartFallback />}>
               <BreakdownChart slices={current.categoryOutflow} />
             </Suspense>
           </section>
 
-          <Link
-            to="/manage"
-            className="rise block rounded-card border border-line bg-card px-5 py-4 text-center text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent"
-            style={riseOrder(8)}
-          >
-            Manage data
-          </Link>
+          <div className="rise pt-1 text-center" style={riseOrder(8)}>
+            <Link
+              to="/manage"
+              className="text-sm font-semibold text-ink-soft transition-colors hover:text-accent"
+            >
+              Manage data →
+            </Link>
+          </div>
         </main>
       )}
     </div>
@@ -211,32 +193,34 @@ function HeroCard({ summary, prior }: { summary: MonthlySummary; prior?: Monthly
       ? 'bg-accent/90 text-solid'
       : 'bg-accent text-solid'
 
+  const soft = isNegative ? 'text-white/70' : 'text-solid/65'
+  const softer = isNegative ? 'text-white/55' : 'text-solid/55'
+
   return (
-    <section
-      className={`rise rounded-card p-6 ${heroTone}`}
-      style={riseOrder(0)}
-    >
-      <h2 className={`text-sm font-medium ${isNegative ? 'text-white/70' : 'text-solid/70'}`}>
-        Net wealth this month
-      </h2>
-      <p className="mt-2 text-[52px] font-extrabold leading-none tracking-tight">
+    <section className={`rise rounded-card p-6 sm:p-7 ${heroTone}`} style={riseOrder(0)}>
+      <h2 className={`text-sm font-medium ${soft}`}>Net wealth this month</h2>
+      <p className="mt-3 text-[3.25rem] font-extrabold leading-none tracking-tight sm:text-[3.5rem]">
         <AnimatedNumber value={netWealthChange} />
       </p>
-      <p className={`mt-3 text-sm ${isNegative ? 'text-white/70' : 'text-solid/70'}`}>
+      <p className={`mt-4 text-sm leading-snug ${soft}`}>
         {combinedIncome > 0
-          ? `${formatPercent(netSavingsRate)} of combined income building wealth`
+          ? `${formatPercent(netSavingsRate)} of combined income`
           : 'Add income to see this as a share of earnings'}
       </p>
-      {hasDrawdown && (
-        <p className={`mt-1.5 text-xs ${isNegative ? 'text-white/60' : 'text-solid/60'}`}>
-          −{formatMoney(savingsDraw)} drawn from savings to cover shortfall · Roth still funded
-        </p>
-      )}
-      {momDelta !== null && (
-        <p className={`mt-1.5 text-xs ${isNegative ? 'text-white/50' : 'text-solid/55'}`}>
-          {momDelta >= 0 ? '+' : ''}
-          {formatMoney(momDelta)} vs last month
-        </p>
+      {(hasDrawdown || momDelta !== null) && (
+        <div className={`mt-3 space-y-1 text-xs leading-snug ${softer}`}>
+          {hasDrawdown && (
+            <p>
+              −{formatMoney(savingsDraw)} drawn from savings · Roth still funded
+            </p>
+          )}
+          {momDelta !== null && (
+            <p>
+              {momDelta >= 0 ? '+' : ''}
+              {formatMoney(momDelta)} vs last month
+            </p>
+          )}
+        </div>
       )}
     </section>
   )
@@ -268,32 +252,27 @@ function YearToDateCard({ summaries }: { summaries: MonthlySummary[] }) {
   const stackTotal = bars.reduce((sum, b) => sum + b.value, 0)
 
   return (
-    <section className="rise rounded-card bg-card p-5 shadow-card" style={riseOrder(2)}>
+    <section className="rise surface-pad" style={riseOrder(2)}>
       <div className="flex items-baseline justify-between gap-2">
-        <h2 className="text-sm font-semibold">{year} year to date</h2>
-        <p className="text-[11px] text-ink-faint">{monthLabel} so far</p>
+        <h2 className="section-title">{year} year to date</h2>
+        <p className="text-[11px] text-ink-faint">{monthLabel}</p>
       </div>
 
-      <div className="mt-3 flex items-end justify-between gap-2">
-        <div>
-          <p className="text-[32px] font-extrabold leading-none tracking-tight">
-            <AnimatedNumber value={totalNetWealth} />
-          </p>
-          <p className="mt-1 text-xs text-ink-soft">
-            net wealth built · {formatPercent(ytdRate)} of income
-          </p>
-        </div>
+      <p className="num mt-4 text-[2rem] font-extrabold leading-none tracking-tight">
+        <AnimatedNumber value={totalNetWealth} />
+      </p>
+      <p className="mt-1.5 text-xs text-ink-soft">
+        net wealth · {formatPercent(ytdRate)} of income
         {totalDraw > 0 && (
-          <p className="text-right text-xs text-danger">
-            {formatMoney(totalDraw)}<br />
-            <span className="text-ink-faint">drawn from savings</span>
-          </p>
+          <span className="text-danger">
+            {' '}
+            · {formatMoney(totalDraw)} drawn
+          </span>
         )}
-      </div>
+      </p>
 
-      {/* Stacked composition bar */}
       {stackTotal > 0 && (
-        <div className="mt-4 flex h-2 w-full gap-px overflow-hidden rounded-full bg-paper" aria-hidden>
+        <div className="mt-5 flex h-1.5 w-full gap-px overflow-hidden rounded-full bg-paper" aria-hidden>
           {bars.map((b) => (
             <div
               key={b.label}
@@ -304,23 +283,27 @@ function YearToDateCard({ summaries }: { summaries: MonthlySummary[] }) {
         </div>
       )}
 
-      <div className="mt-3 grid grid-cols-3 gap-2">
+      <dl className="mt-4 space-y-2">
         {[
           { label: 'Retirement', value: totalRetirement, dot: 'bg-retire' },
           { label: 'Invested', value: totalInvesting, dot: 'bg-invest' },
           { label: 'Cash savings', value: totalSaving, dot: 'bg-save', canNeg: true },
         ].map((item) => (
-          <div key={item.label} className="text-center">
-            <p className="flex items-center justify-center gap-1 text-[11px] text-ink-faint">
+          <div key={item.label} className="flex items-center justify-between gap-3 text-sm">
+            <dt className="flex items-center gap-2 text-ink-soft">
               <span className={`size-1.5 rounded-full ${item.dot}`} aria-hidden />
               {item.label}
-            </p>
-            <p className={`num mt-0.5 text-sm font-semibold ${'canNeg' in item && item.canNeg && totalSaving < 0 ? 'text-danger' : ''}`}>
+            </dt>
+            <dd
+              className={`num font-semibold ${
+                'canNeg' in item && item.canNeg && totalSaving < 0 ? 'text-danger' : ''
+              }`}
+            >
               {formatMoney(item.value)}
-            </p>
+            </dd>
           </div>
         ))}
-      </div>
+      </dl>
     </section>
   )
 }
@@ -332,47 +315,40 @@ function GuidelinesCard({ summary }: { summary: MonthlySummary }) {
 
   const statusDot: Record<string, string> = {
     'on-track': 'bg-accent',
-    'over': 'bg-danger',
-    'under': 'bg-warn',
-    'info': 'bg-line',
+    over: 'bg-danger',
+    under: 'bg-warn',
+    info: 'bg-line',
   }
 
   return (
-    <section className="rise rounded-card bg-card p-5 shadow-card" style={riseOrder(3)}>
-      <div className="flex items-baseline justify-between gap-2">
-        <h2 className="text-sm font-semibold">Monthly guidelines</h2>
-        <p className="text-[11px] text-ink-faint">based on {formatMoney(income)} income</p>
-      </div>
-      <p className="mt-0.5 text-xs text-ink-soft">
-        Targets based on income. Actual vs. recommended — not hard rules.
+    <section className="rise surface-pad" style={riseOrder(3)}>
+      <h2 className="section-title">Monthly guidelines</h2>
+      <p className="section-hint">
+        Targets from {formatMoney(income)} income — guides, not hard rules
       </p>
 
-      <div className="mt-4 space-y-4">
+      <div className="mt-5 space-y-5">
         {rows.map((row) => (
           <GuidelineRowItem key={row.id} row={row} income={income} statusDot={statusDot} />
         ))}
       </div>
 
-      {/* Flexible spend legend */}
-      <div className="mt-5 border-t border-line pt-4">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-faint">
-          Flexible spend breakdown (guideline, not tracked)
-        </p>
-        <div className="mt-2 space-y-1.5">
+      <details className="mt-5 border-t border-line pt-4">
+        <summary className="cursor-pointer text-xs font-medium text-ink-soft transition-colors hover:text-ink">
+          Flexible spend targets
+        </summary>
+        <div className="mt-3 space-y-2">
           {flexLegend.map((leg) => (
             <div key={leg.id} className="flex items-center justify-between text-xs text-ink-soft">
               <span>{leg.label}</span>
               <span className="num font-medium">
                 ~{formatMoney(leg.targetAmount)}
-                <span className="ml-1 font-normal text-ink-faint">/ mo</span>
+                <span className="ml-1 font-normal text-ink-faint">/mo</span>
               </span>
             </div>
           ))}
         </div>
-        <p className="mt-2 text-[11px] text-ink-faint">
-          These are mental targets within your flexible bucket. Log breakdown separately if you want to track them.
-        </p>
-      </div>
+      </details>
     </section>
   )
 }
@@ -387,9 +363,10 @@ function GuidelineRowItem({
   statusDot: Record<string, string>
 }) {
   const fillPct = income > 0 ? Math.min(1, row.actualAmount / row.targetAmount) : 0
-  const overPct = income > 0 && row.actualAmount > row.targetAmount
-    ? Math.min(1, (row.actualAmount - row.targetAmount) / row.targetAmount)
-    : 0
+  const overPct =
+    income > 0 && row.actualAmount > row.targetAmount
+      ? Math.min(1, (row.actualAmount - row.targetAmount) / row.targetAmount)
+      : 0
   const isOver = row.status === 'over'
   const isUnder = row.status === 'under'
 
@@ -404,13 +381,11 @@ function GuidelineRowItem({
           <span className={`num font-semibold ${isOver ? 'text-danger' : isUnder ? 'text-warn' : ''}`}>
             {formatMoney(row.actualAmount)}
           </span>
-          <span className="text-xs text-ink-faint">
-            / {formatMoney(row.targetAmount)} target
-          </span>
+          <span className="text-xs text-ink-faint">/ {formatMoney(row.targetAmount)}</span>
         </span>
       </div>
 
-      <div className="relative mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-paper">
+      <div className="relative mt-1.5 h-1 w-full overflow-hidden rounded-full bg-paper">
         <div
           className={`h-full rounded-full transition-[width] duration-700 ${
             isOver ? 'bg-danger' : isUnder ? 'bg-warn' : 'bg-accent'
@@ -425,12 +400,14 @@ function GuidelineRowItem({
         )}
       </div>
 
-      <div className="mt-1 flex items-center justify-between">
+      <div className="mt-1 flex items-center justify-between gap-2">
         {row.note && <p className="text-[11px] text-ink-faint">{row.note}</p>}
         {row.status !== 'info' && (
-          <p className={`ml-auto shrink-0 text-[11px] font-medium ${
-            isOver ? 'text-danger' : isUnder ? 'text-warn' : 'text-accent'
-          }`}>
+          <p
+            className={`ml-auto shrink-0 text-[11px] font-medium ${
+              isOver ? 'text-danger' : isUnder ? 'text-warn' : 'text-accent'
+            }`}
+          >
             {guidelineStatusLabel(row.status)}
           </p>
         )}
@@ -443,26 +420,25 @@ function FairnessCard({ summary }: { summary: MonthlySummary }) {
   const rows = OWNERS.map((owner) => ({ name: OWNER_LABELS[owner], s: summary[owner] }))
 
   return (
-    <section className="rise rounded-card bg-card p-5 shadow-card" style={riseOrder(4)}>
-      <h2 className="text-sm font-semibold">Joint costs, split by income</h2>
-      <p className="mt-0.5 text-xs text-ink-soft">
-        {formatMoney(summary.jointExpenses)} of shared bills, divided in proportion to what each
-        of you earns this month
+    <section className="rise surface-pad" style={riseOrder(4)}>
+      <h2 className="section-title">Joint costs, split by income</h2>
+      <p className="section-hint">
+        {formatMoney(summary.jointExpenses)} shared bills, proportional to earnings
       </p>
-      <div className="mt-4 space-y-4">
+      <div className="mt-5 space-y-5">
         {rows.map(({ name, s }) => (
           <div key={name}>
             <div className="flex items-baseline justify-between text-sm">
               <span className="font-medium">{name}</span>
-              <span className="num">
+              <span className="num font-semibold">
                 {formatMoney(s.fairShare)}
-                <span className="ml-1.5 text-xs text-ink-soft">
+                <span className="ml-1.5 text-xs font-normal text-ink-faint">
                   {formatPercent(s.incomeRatio)}
                 </span>
               </span>
             </div>
             <div
-              className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-accent-soft"
+              className="mt-1.5 h-1 overflow-hidden rounded-full bg-accent-soft"
               role="img"
               aria-label={`${name}: ${formatPercent(s.incomeRatio)} of joint costs`}
             >
@@ -471,10 +447,10 @@ function FairnessCard({ summary }: { summary: MonthlySummary }) {
                 style={{ width: `${Math.min(100, s.incomeRatio * 100)}%` }}
               />
             </div>
-            <p className="mt-1 text-[11px] text-ink-faint">
-              Personal &amp; cards: {formatMoney(s.personalExpenses + s.cardSpend + s.otherSpend)}
+            <p className="mt-1.5 text-[11px] text-ink-faint">
+              Personal &amp; cards {formatMoney(s.personalExpenses + s.cardSpend + s.otherSpend)}
               {' · '}
-              Total outflow: {formatMoney(s.totalOutflow)}
+              Total out {formatMoney(s.totalOutflow)}
             </p>
           </div>
         ))}
@@ -486,12 +462,12 @@ function FairnessCard({ summary }: { summary: MonthlySummary }) {
 function FairnessPlaceholder({ summary }: { summary: MonthlySummary }) {
   return (
     <section
-      className="rise rounded-card border border-dashed border-line bg-card p-5"
+      className="rise rounded-card border border-dashed border-line bg-card/60 p-5"
       style={riseOrder(4)}
     >
-      <h2 className="text-sm font-semibold">Joint costs, split by income</h2>
+      <h2 className="section-title">Joint costs, split by income</h2>
       <p className="mt-2 text-sm text-ink-soft">
-        Add income to see each person's fair share of{' '}
+        Add income to see each person&apos;s fair share of{' '}
         {formatMoney(summary.jointExpenses)} in shared bills.
       </p>
       <Link

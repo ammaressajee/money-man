@@ -117,24 +117,23 @@ export function TrendChart({ summaries, selectedKey }: Props) {
         </ResponsiveContainer>
       </div>
 
-      {/* Legend */}
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-        <span className="flex items-center gap-1.5 text-xs text-ink-soft">
-          <span className="h-0.5 w-4 rounded-full bg-clay" />
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
+        <span className="flex items-center gap-1.5 text-[11px] text-ink-soft">
+          <span className="h-0.5 w-3.5 rounded-full bg-clay" />
           Logged spend
         </span>
-        <span className="flex items-center gap-1.5 text-xs text-ink-soft">
+        <span className="flex items-center gap-1.5 text-[11px] text-ink-soft">
           <span
-            className="h-0.5 w-4 rounded-full"
+            className="h-0.5 w-3.5 rounded-full"
             style={{
               background: 'repeating-linear-gradient(to right, #8fa39b 0, #8fa39b 4px, transparent 4px, transparent 7px)',
             }}
           />
           Income
         </span>
-        <span className="flex items-center gap-1.5 text-xs text-ink-soft">
+        <span className="flex items-center gap-1.5 text-[11px] text-ink-soft">
           <span
-            className="h-0.5 w-4 rounded-full"
+            className="h-0.5 w-3.5 rounded-full"
             style={{
               background: 'repeating-linear-gradient(to right, #1fd6b5 0, #1fd6b5 4px, transparent 4px, transparent 7px)',
             }}

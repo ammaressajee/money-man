@@ -24,21 +24,26 @@ export default function ManageData() {
   if (loading && !data) return <FullPageLoader />
 
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-xl px-4 pb-10 pt-5">
+    <div className="page page-narrow">
       <AppHeader />
 
-      <div className="mb-1 flex items-center justify-between">
-        <h1 className="text-xl font-bold tracking-tight">Manage data</h1>
-        <Link to="/" className="text-sm font-medium text-accent hover:text-accent-deep">
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight">Manage data</h1>
+          <p className="mt-1 text-sm text-ink-soft">
+            Set it up once, then log card statements each cycle.
+          </p>
+        </div>
+        <Link
+          to="/"
+          className="shrink-0 pt-1 text-sm font-medium text-ink-soft transition-colors hover:text-accent"
+        >
           ← Dashboard
         </Link>
       </div>
-      <p className="mb-5 text-sm text-ink-soft">
-        Set it up once, then just log card statements each cycle.
-      </p>
 
       {error && (
-        <div className="mb-5 rounded-card bg-clay-soft p-4 text-sm text-danger">
+        <div className="mb-5 rounded-xl bg-clay-soft px-4 py-3 text-sm text-danger">
           {error}{' '}
           <button onClick={() => void refresh()} className="font-semibold underline">
             Retry
@@ -49,24 +54,29 @@ export default function ManageData() {
       <nav
         role="tablist"
         aria-label="Data sections"
-        className="mb-5 flex rounded-xl border border-line bg-card p-1 shadow-card"
+        className="mb-6 flex gap-1 border-b border-line"
       >
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            role="tab"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
-            className={`flex-1 rounded-lg px-2 py-2.5 text-sm font-medium transition-colors ${
-              tab === t.id ? 'bg-accent-soft font-semibold text-accent' : 'text-ink-soft hover:text-ink'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+        {TABS.map((t) => {
+          const selected = tab === t.id
+          return (
+            <button
+              key={t.id}
+              role="tab"
+              aria-selected={selected}
+              onClick={() => setTab(t.id)}
+              className={`-mb-px flex-1 border-b-2 px-2 py-2.5 text-sm font-medium transition-colors ${
+                selected
+                  ? 'border-accent font-semibold text-accent'
+                  : 'border-transparent text-ink-soft hover:text-ink'
+              }`}
+            >
+              {t.label}
+            </button>
+          )
+        })}
       </nav>
 
-      <div className="rise">
+      <div className="rise" key={tab}>
         {tab === 'income' && <IncomeSection />}
         {tab === 'fixed' && <FixedItemsSection />}
         {tab === 'cards' && <CardsSection />}

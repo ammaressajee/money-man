@@ -27,7 +27,7 @@
   --color-retire: #5eb0d4;
   --color-retire-soft: #122430;
 
-  --radius-card: 1rem;
+  --radius-card: 1.125rem;
   /* Flat elevation — hairline edge only, no soft glow */
   --shadow-card: inset 0 0 0 1px var(--color-line);
   --shadow-card-lg: inset 0 0 0 1px rgb(31 214 181 / 0.28);
@@ -56,6 +56,13 @@ html {
 body {
   @apply bg-paper text-ink font-sans antialiased;
   font-optical-sizing: auto;
+  /* Quiet atmosphere — not flat, not neon */
+  background-image:
+    radial-gradient(900px 480px at 12% -8%, rgb(31 214 181 / 0.07), transparent 55%),
+    radial-gradient(720px 420px at 92% 4%, rgb(240 160 112 / 0.045), transparent 50%),
+    radial-gradient(640px 520px at 50% 110%, rgb(94 176 212 / 0.04), transparent 55%);
+  background-attachment: fixed;
+  min-height: 100dvh;
 }
 
 .num {
@@ -66,7 +73,7 @@ body {
 /* Staggered entrance for dashboard cards */
 .rise {
   animation: var(--animate-rise);
-  animation-delay: calc(var(--rise-order, 0) * 60ms);
+  animation-delay: calc(var(--rise-order, 0) * 55ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -82,6 +89,62 @@ body {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* Page shell — consistent reading width + breathing room */
+.page {
+  @apply mx-auto min-h-dvh w-full px-4 pb-14 pt-5;
+}
+
+.page-narrow {
+  @apply max-w-xl;
+}
+
+.page-wide {
+  @apply max-w-2xl;
+}
+
+/* Surface for interactive / dense content blocks */
+.surface {
+  @apply rounded-card bg-card shadow-card;
+}
+
+.surface-pad {
+  @apply rounded-card bg-card p-5 shadow-card;
+}
+
+/* Quiet section titles */
+.section-label {
+  @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-faint;
+}
+
+.section-title {
+  @apply text-[15px] font-semibold tracking-tight text-ink;
+}
+
+.section-hint {
+  @apply mt-0.5 text-xs leading-relaxed text-ink-soft;
+}
+
+/* Month pager — shared chrome */
+.month-nav {
+  @apply flex items-center justify-between gap-3;
+}
+
+.month-nav-btn {
+  @apply rounded-lg px-2.5 py-1.5 text-sm font-medium text-ink-soft transition-colors
+    hover:bg-card hover:text-ink disabled:pointer-events-none disabled:opacity-30;
+}
+
+.month-nav-label {
+  @apply text-sm font-semibold tracking-tight;
+}
+
+/* List rows (manage) — interactive, so they earn a surface */
+.list-row {
+  @apply flex w-full items-center justify-between gap-3 rounded-xl bg-card px-4 py-3.5
+    text-left shadow-card transition-[box-shadow,background-color]
+    hover:shadow-card-lg active:bg-paper/40;
 }
 
 /* Sankey ribbon entrance — soft draw-in without fighting reduced-motion */

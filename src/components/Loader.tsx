@@ -10,7 +10,7 @@ export function Spinner({ className = '' }: { className?: string }) {
 
 export function FullPageLoader() {
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-paper">
+    <div className="flex min-h-dvh items-center justify-center">
       <Spinner className="size-8" />
     </div>
   )
@@ -19,15 +19,11 @@ export function FullPageLoader() {
 /** Soft placeholder blocks shown while dashboard data loads. */
 export function DashboardSkeleton() {
   return (
-    <div className="space-y-4" aria-hidden>
-      <div className="h-44 animate-pulse rounded-card bg-accent-soft" />
-      <div className="h-24 animate-pulse rounded-card bg-card" />
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div className="h-20 animate-pulse rounded-card bg-card" />
-        <div className="h-20 animate-pulse rounded-card bg-card" />
-        <div className="h-20 animate-pulse rounded-card bg-card" />
-      </div>
-      <div className="h-40 animate-pulse rounded-card bg-card" />
+    <div className="space-y-6" aria-hidden>
+      <div className="h-40 animate-pulse rounded-card bg-accent-soft" />
+      <div className="h-56 animate-pulse rounded-card bg-card" />
+      <div className="h-36 animate-pulse rounded-card bg-card" />
+      <div className="h-48 animate-pulse rounded-card bg-card" />
     </div>
   )
 }

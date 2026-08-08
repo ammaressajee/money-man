@@ -122,7 +122,7 @@ export function FlowSankey({ summary }: { summary: MonthlySummary }) {
     <div className="sankey-shell">
       <div
         ref={shellRef}
-        className="relative overflow-hidden rounded-2xl bg-paper ring-1 ring-line"
+        className="relative overflow-hidden rounded-xl bg-paper ring-1 ring-line/80"
       >
 
         {stageLabels.length > 0 && (
@@ -233,11 +233,11 @@ export function FlowSankey({ summary }: { summary: MonthlySummary }) {
         Tap a ribbon to see the amount
       </p>
 
-      <div className="mt-3.5 flex flex-wrap justify-center gap-x-3.5 gap-y-2 sm:justify-start">
+      <div className="mt-3.5 flex flex-wrap justify-center gap-x-4 gap-y-1.5 sm:justify-start">
         {LEGEND.filter((entry) => tonesPresent.has(entry.tone)).map((entry) => (
           <span
             key={entry.tone}
-            className="inline-flex items-center gap-1.5 rounded-full bg-paper/80 px-2.5 py-1 text-[11px] font-medium text-ink-soft ring-1 ring-line/70"
+            className="inline-flex items-center gap-1.5 text-[11px] font-medium text-ink-soft"
           >
             <span className={`size-1.5 rounded-full ${entry.swatch}`} aria-hidden />
             {entry.label}

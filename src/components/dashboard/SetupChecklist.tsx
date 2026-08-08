@@ -27,12 +27,12 @@ const STEPS = [
   {
     id: 'income' as const,
     label: 'Add income',
-    detail: 'Your paychecks and any recurring earnings',
+    detail: 'Paychecks and recurring earnings',
   },
   {
     id: 'fixed' as const,
     label: 'Add fixed costs',
-    detail: 'Rent, subscriptions, investments — set it once',
+    detail: 'Rent, subscriptions, investments',
   },
 ]
 
@@ -40,24 +40,20 @@ export function SetupChecklist({ status }: Props) {
   const firstIncomplete = STEPS.find((s) => status.incompleteRequiredSteps.includes(s.id))
 
   return (
-    <div className="rise rounded-card bg-card px-6 py-10 shadow-card">
-      <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-accent-soft">
-        <span className="size-3.5 rounded-full bg-accent" aria-hidden />
-      </div>
-      <h2 className="mt-5 text-center text-lg font-bold tracking-tight">Set up your household</h2>
-      <p className="mx-auto mt-2 max-w-xs text-center text-sm text-ink-soft">
-        Add your income and fixed costs once — the dashboard fills itself in. After that,
-        it's just a card balance once a month.
+    <div className="rise surface-pad px-6 py-9">
+      <h2 className="text-center text-lg font-bold tracking-tight">Set up your household</h2>
+      <p className="mx-auto mt-2 max-w-xs text-center text-sm leading-relaxed text-ink-soft">
+        Add income and fixed costs once. After that, it&apos;s just a card balance each month.
       </p>
 
-      <ul className="mt-6 space-y-3" aria-label="Setup steps">
+      <ul className="mt-7 space-y-2" aria-label="Setup steps">
         {STEPS.map((step) => {
           const done = !status.incompleteRequiredSteps.includes(step.id)
           return (
             <li
               key={step.id}
               className={`flex items-center gap-3 rounded-xl px-4 py-3 ${
-                done ? 'bg-accent-soft/60' : 'border border-line bg-paper'
+                done ? 'bg-accent-soft/50' : 'bg-paper ring-1 ring-line'
               }`}
             >
               <CheckIcon done={done} />
@@ -74,30 +70,36 @@ export function SetupChecklist({ status }: Props) {
         {status.hasActiveCards && (
           <li
             className={`flex items-center gap-3 rounded-xl px-4 py-3 ${
-              status.hasCurrentMonthStatements ? 'bg-accent-soft/60' : 'border border-line bg-paper'
+              status.hasCurrentMonthStatements
+                ? 'bg-accent-soft/50'
+                : 'bg-paper ring-1 ring-line'
             }`}
           >
             <CheckIcon done={status.hasCurrentMonthStatements} />
             <div>
-              <p className={`text-sm font-semibold ${status.hasCurrentMonthStatements ? 'text-accent' : 'text-ink'}`}>
-                Log this month's card balances
+              <p
+                className={`text-sm font-semibold ${
+                  status.hasCurrentMonthStatements ? 'text-accent' : 'text-ink'
+                }`}
+              >
+                Log this month&apos;s card balances
               </p>
-              <p className="text-xs text-ink-soft">Once per billing cycle — takes 30 seconds</p>
+              <p className="text-xs text-ink-soft">Once per billing cycle</p>
             </div>
           </li>
         )}
       </ul>
 
-      <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+      <div className="mt-7 flex flex-col items-center gap-3">
         <Link
-          to={`/manage`}
+          to="/manage"
           className="inline-block rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-solid transition-colors hover:bg-accent-deep"
         >
           {firstIncomplete ? `Add ${firstIncomplete.label.toLowerCase()}` : 'Manage data'}
         </Link>
         <Link
           to="/flow"
-          className="inline-block text-sm font-medium text-accent hover:text-accent-deep"
+          className="text-sm font-medium text-ink-soft transition-colors hover:text-accent"
         >
           See how money flows
         </Link>

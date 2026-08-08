@@ -26,18 +26,18 @@ export function MoneyManMark({ className = 'size-9' }: { className?: string }) {
 export function Wordmark({ size = 'default' }: { size?: 'default' | 'hero' }) {
   const hero = size === 'hero'
   return (
-    <span className={`flex items-center ${hero ? 'gap-3' : 'gap-2.5'}`}>
-      <MoneyManMark className={hero ? 'size-11' : 'size-9'} />
+    <span className={`flex items-center ${hero ? 'gap-3.5' : 'gap-2.5'}`}>
+      <MoneyManMark className={hero ? 'size-12' : 'size-8'} />
       <span className="leading-none">
         <span
           className={`block font-extrabold tracking-tight text-ink ${
-            hero ? 'text-[1.65rem]' : 'text-[1.2rem]'
+            hero ? 'text-[1.85rem]' : 'text-[1.15rem]'
           }`}
         >
           Money Man
         </span>
         {hero && (
-          <span className="mt-1 block text-[12px] font-medium tracking-wide text-ink-soft">
+          <span className="mt-1.5 block text-[13px] font-medium tracking-wide text-ink-soft">
             Household money, clear at a glance
           </span>
         )}
@@ -49,10 +49,10 @@ export function Wordmark({ size = 'default' }: { size?: 'default' | 'hero' }) {
 export function AppHeader({ subtitle }: { subtitle?: string }) {
   const { isDemo, signOut } = useAuth()
   return (
-    <header className="mb-7">
+    <header className="mb-8">
       {isDemo && (
-        <p className="mb-4 rounded-full bg-clay-soft px-4 py-2 text-center text-xs font-medium text-clay">
-          Demo data — connect Supabase env vars to go live (see README)
+        <p className="mb-5 border-b border-clay/20 pb-3 text-center text-xs leading-relaxed text-clay">
+          Demo data — connect Supabase env vars to go live
         </p>
       )}
       <div className="flex items-center justify-between gap-3">
