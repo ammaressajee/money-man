@@ -95,12 +95,13 @@ export function MonthlyFlowCard({
           amount={summary.effectiveSaving}
           pct={pctOfIncome(summary.effectiveSaving)}
           barWidth={width(Math.max(0, summary.effectiveSaving))}
-          barClass="bg-save"
+          barClass={hasDrawdown ? 'bg-danger' : 'bg-save'}
           detail={
             hasDrawdown
-              ? `−${formatMoney(summary.savingsDraw)} covered shortfall · net cash savings`
+              ? `Below ${formatMoney(summary.totalSaving)} planned · −${formatMoney(summary.savingsDraw)} covered shortfall`
               : 'Cash — incl. paycheck auto-transfers'
           }
+          danger={hasDrawdown}
         />
         <FlowRow
           label="Invested"
@@ -183,7 +184,11 @@ function FlowRow({
           style={{ width: barWidth }}
         />
       </div>
-      {detail && <p className="mt-1 text-[11px] text-ink-faint">{detail}</p>}
+      {detail && (
+        <p className={`mt-1 text-[11px] ${danger ? 'text-danger/75' : 'text-ink-faint'}`}>
+          {detail}
+        </p>
+      )}
     </div>
   )
 }

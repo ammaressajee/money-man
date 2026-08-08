@@ -29,8 +29,8 @@ export default function Login() {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-paper px-4">
       <div className="rise w-full max-w-sm">
-        <div className="mb-6 flex justify-center">
-          <Wordmark />
+        <div className="mb-8 flex justify-center">
+          <Wordmark size="hero" />
         </div>
         <form
           onSubmit={onSubmit}

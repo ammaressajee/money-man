@@ -116,7 +116,6 @@ export default function Dashboard() {
 
           <HeroCard summary={current} prior={prior} />
           <MonthlyFlowCard summary={current} style={riseOrder(1)} />
-          <StatRow summary={current} prior={prior} />
           <YearToDateCard summaries={summaries} />
           <GuidelinesCard summary={current} />
 
@@ -241,80 +240,6 @@ function HeroCard({ summary, prior }: { summary: MonthlySummary; prior?: Monthly
   )
 }
 
-function StatRow({ summary, prior }: { summary: MonthlySummary; prior?: MonthlySummary }) {
-  const delta = (now: number, before?: number) =>
-    before !== undefined
-      ? `${now - before >= 0 ? '+' : ''}${formatMoney(now - before)} vs last month`
-      : null
-
-  const hasDrawdown = summary.savingsDraw > 0
-
-  const stats = [
-    {
-      label: 'Income',
-      value: formatMoney(summary.combinedIncome),
-      hint: null as string | null,
-      dot: null as string | null,
-    },
-    {
-      label: 'Spending',
-      value: formatMoney(summary.combinedOutflow),
-      hint: delta(summary.combinedOutflow, prior?.combinedOutflow),
-      dot: 'bg-clay',
-    },
-    {
-      label: 'Net wealth',
-      value: formatMoney(summary.netWealthChange),
-      hint: `${formatPercent(summary.netSavingsRate)} of income`,
-      dot: null,
-    },
-    {
-      label: hasDrawdown ? 'Cash savings (drawn)' : 'Cash savings',
-      value: formatMoney(summary.effectiveSaving),
-      hint: hasDrawdown ? `−${formatMoney(summary.savingsDraw)} drawn` : null,
-      dot: 'bg-save',
-      danger: hasDrawdown,
-    },
-    {
-      label: 'Invested',
-      value: formatMoney(summary.totalInvesting),
-      hint: null,
-      dot: 'bg-invest',
-    },
-    {
-      label: 'Retirement',
-      value: formatMoney(summary.totalRetirement),
-      hint: null,
-      dot: 'bg-retire',
-    },
-  ]
-
-  return (
-    <section
-      className="rise grid grid-cols-2 gap-3 sm:grid-cols-3"
-      style={riseOrder(2)}
-      aria-label="Monthly totals"
-    >
-      {stats.map((s) => (
-        <div key={s.label} className="rounded-card bg-card px-4 py-3.5 shadow-card">
-          <p className="flex items-center gap-1.5 text-xs font-medium text-ink-soft">
-            {s.dot && <span className={`size-1.5 rounded-full ${s.dot}`} aria-hidden />}
-            {s.label}
-          </p>
-          <p className={`num mt-1 text-lg font-bold ${'danger' in s && s.danger ? 'text-danger' : ''}`}>
-            {s.value}
-          </p>
-          {s.hint && (
-            <p className={`mt-0.5 text-[11px] ${'danger' in s && s.danger ? 'text-danger/70' : 'text-ink-faint'}`}>
-              {s.hint}
-            </p>
-          )}
-        </div>
-      ))}
-    </section>
-  )
-}
-
 function YearToDateCard({ summaries }: { summaries: MonthlySummary[] }) {
   const year = new Date().getFullYear()
   const ytd = summaries.filter((s) => s.month.getFullYear() === year)
@@ -341,7 +266,7 @@ function YearToDateCard({ summaries }: { summaries: MonthlySummary[] }) {
   const stackTotal = bars.reduce((sum, b) => sum + b.value, 0)
 
   return (
-    <section className="rise rounded-card bg-card p-5 shadow-card" style={{ '--rise-order': 2.5 } as CSSProperties}>
+    <section className="rise rounded-card bg-card p-5 shadow-card" style={riseOrder(2)}>
       <div className="flex items-baseline justify-between gap-2">
         <h2 className="text-sm font-semibold">{year} year to date</h2>
         <p className="text-[11px] text-ink-faint">{monthLabel} so far</p>
