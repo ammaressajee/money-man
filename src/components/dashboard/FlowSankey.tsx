@@ -122,17 +122,8 @@ export function FlowSankey({ summary }: { summary: MonthlySummary }) {
     <div className="sankey-shell">
       <div
         ref={shellRef}
-        className="relative overflow-hidden rounded-2xl bg-[linear-gradient(165deg,#0c1412_0%,#0f1a17_48%,#0d1f1b_100%)] ring-1 ring-line/80"
+        className="relative overflow-hidden rounded-2xl bg-paper ring-1 ring-line"
       >
-        {/* Soft atmosphere */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-80"
-          aria-hidden
-          style={{
-            background:
-              'radial-gradient(ellipse 70% 55% at 18% 22%, rgb(31 214 181 / 0.12), transparent 60%), radial-gradient(ellipse 55% 45% at 88% 78%, rgb(240 160 112 / 0.1), transparent 55%)',
-          }}
-        />
 
         {stageLabels.length > 0 && (
           <div className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-12" aria-hidden>
@@ -176,18 +167,10 @@ export function FlowSankey({ summary }: { summary: MonthlySummary }) {
                   <stop offset="100%" stopColor={link.target.color} />
                 </linearGradient>
               ))}
-              <filter id={`${gradientPrefix}-glow`} x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="2.5" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
             </defs>
 
             <g transform={`translate(${offsetX}, ${offsetY})`}>
               {layout.links.map((link, i) => {
-                const active = highlighted === i
                 return (
                   <path
                     key={i}
@@ -197,7 +180,6 @@ export function FlowSankey({ summary }: { summary: MonthlySummary }) {
                     className="sankey-ribbon cursor-pointer"
                     style={{
                       transition: 'fill-opacity 0.22s ease',
-                      filter: active ? `url(#${gradientPrefix}-glow)` : undefined,
                     }}
                     onMouseEnter={() => setActiveLink(i)}
                     onMouseLeave={() => setActiveLink(null)}
@@ -268,7 +250,7 @@ export function FlowSankey({ summary }: { summary: MonthlySummary }) {
 
 function FlowDetailCard({ link }: { link: SankeyLink }) {
   return (
-    <div className="pointer-events-none flex items-center justify-between gap-3 rounded-xl bg-solid/95 px-3.5 py-2.5 text-ink shadow-[0_12px_32px_-12px_rgb(0_0_0_/_0.65)] ring-1 ring-line backdrop-blur-sm">
+    <div className="pointer-events-none flex items-center justify-between gap-3 rounded-xl bg-card px-3.5 py-2.5 text-ink ring-1 ring-line">
       <div className="min-w-0">
         <p className="truncate text-[11px] font-medium text-ink-soft">
           {link.source.label}
@@ -288,7 +270,6 @@ function NodeGroup({
   node,
   layout,
   isMobile,
-  focused,
   dimmed,
   onFocus,
   onBlur,
@@ -296,7 +277,7 @@ function NodeGroup({
   node: SankeyNode
   layout: SankeyLayout
   isMobile: boolean
-  focused: boolean
+  focused?: boolean
   dimmed: boolean
   onFocus: () => void
   onBlur: () => void
@@ -358,10 +339,6 @@ function NodeGroup({
         height={barH}
         rx={4}
         fill={node.color}
-        style={{
-          filter: focused ? 'brightness(1.08)' : undefined,
-          transition: 'filter 0.15s ease',
-        }}
       />
       {vertical && node.height >= 22 && (
         <rect

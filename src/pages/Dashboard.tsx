@@ -127,7 +127,7 @@ export default function Dashboard() {
 
           <Link
             to="/flow"
-            className="rise block rounded-card bg-card p-5 shadow-card transition-shadow hover:shadow-card-lg"
+            className="rise block rounded-card bg-card p-5 shadow-card transition-[box-shadow] hover:shadow-card-lg"
             style={riseOrder(5)}
           >
             <div className="flex items-start justify-between gap-3">
@@ -213,7 +213,7 @@ function HeroCard({ summary, prior }: { summary: MonthlySummary; prior?: Monthly
 
   return (
     <section
-      className={`rise rounded-card p-6 shadow-card-lg ${heroTone}`}
+      className={`rise rounded-card p-6 ${heroTone}`}
       style={riseOrder(0)}
     >
       <h2 className={`text-sm font-medium ${isNegative ? 'text-white/70' : 'text-solid/70'}`}>

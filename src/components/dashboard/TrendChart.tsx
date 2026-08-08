@@ -68,7 +68,7 @@ export function TrendChart({ summaries, selectedKey }: Props) {
                 border: '1px solid #1e2c28',
                 background: '#111917',
                 color: '#e8f0ed',
-                boxShadow: '0 12px 32px -12px rgb(0 0 0 / 0.55)',
+                boxShadow: 'none',
                 fontSize: 12,
               }}
             />
