@@ -2,7 +2,7 @@ import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, XAxis, YAxis } fro
 import type { CategorySlice } from '../../lib/summary'
 import { formatMoney, formatPercent } from '../../lib/money'
 
-const BAR_COLORS = ['#0e7a6d', '#1a9486', '#2aac9e', '#b96a45', '#c97e5a', '#99a5a0']
+const BAR_COLORS = ['#1fd6b5', '#3ecfba', '#5eb0d4', '#f0a070', '#f5b48a', '#5c7169']
 
 export function BreakdownChart({ slices }: { slices: CategorySlice[] }) {
   if (slices.length === 0) {
@@ -37,7 +37,7 @@ export function BreakdownChart({ slices }: { slices: CategorySlice[] }) {
               width={108}
               tickLine={false}
               axisLine={false}
-              tick={{ fontSize: 12, fill: '#172723' }}
+              tick={{ fontSize: 12, fill: '#e8f0ed' }}
             />
             <Bar dataKey="amount" radius={[6, 6, 6, 6]} barSize={16}>
               {slices.map((_, i) => (
@@ -47,7 +47,7 @@ export function BreakdownChart({ slices }: { slices: CategorySlice[] }) {
                 dataKey="amount"
                 position="right"
                 formatter={(v) => formatMoney(Number(v))}
-                style={{ fontSize: 12, fill: '#66746f', fontVariantNumeric: 'tabular-nums' }}
+                style={{ fontSize: 12, fill: '#8fa39b', fontVariantNumeric: 'tabular-nums' }}
               />
             </Bar>
           </BarChart>

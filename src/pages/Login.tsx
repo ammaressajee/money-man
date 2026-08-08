@@ -75,9 +75,9 @@ export default function Login() {
           <button
             type="submit"
             disabled={submitting}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-accent-deep disabled:opacity-60"
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-[15px] font-semibold text-solid transition-colors hover:bg-accent-deep disabled:opacity-60"
           >
-            {submitting && <Spinner className="border-white/40 border-t-white" />}
+            {submitting && <Spinner className="border-solid/40 border-t-solid" />}
             Sign in
           </button>
         </form>

@@ -94,7 +94,7 @@ const KIND_DOTS: Record<Exclude<FixedKind, 'expense'>, string> = {
 function KindBadge({ kind }: { kind: FixedKind }) {
   if (kind === 'expense') return null
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent-deep">
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent">
       <span className={`size-1.5 rounded-full ${KIND_DOTS[kind]}`} aria-hidden />
       {KIND_LABELS[kind]}
     </span>

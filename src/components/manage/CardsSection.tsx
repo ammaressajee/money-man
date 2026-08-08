@@ -188,7 +188,7 @@ function CardBlock({ card, fixedItems }: { card: CreditCard; fixedItems: FixedIt
         )}
 
         {showZeroNudge && (
-          <p className="rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-xs text-amber-800">
+          <p className="rounded-xl border border-warn/25 bg-warn-soft px-3.5 py-2.5 text-xs text-warn">
             This card autopays {autopaidItems.map((i) => i.name).join(', ')} (~{formatMoneyExact(autopaidMonthly)}/mo). A $0 cycle is unlikely — are you sure you entered Purchases rather than the New Balance?
           </p>
         )}
@@ -214,7 +214,7 @@ function CardBlock({ card, fixedItems }: { card: CreditCard; fixedItems: FixedIt
                 })}
               </span>
               <span className="flex items-center gap-3">
-                <span className={`num font-semibold ${s.balance < 0 ? 'text-accent-deep' : ''}`}>
+                <span className={`num font-semibold ${s.balance < 0 ? 'text-accent' : ''}`}>
                   {s.balance < 0 ? `−${formatMoneyExact(-s.balance)}` : formatMoneyExact(s.balance)}
                   {s.balance < 0 && <span className="ml-1 text-[11px] font-normal text-ink-faint">refund</span>}
                 </span>

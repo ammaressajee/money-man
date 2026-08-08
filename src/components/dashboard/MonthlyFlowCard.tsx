@@ -143,7 +143,7 @@ function HeadlineStat({ label, value, accent }: { label: string; value: number; 
   return (
     <div className="min-w-0 text-center">
       <p className="text-[11px] font-medium uppercase tracking-wide text-ink-faint">{label}</p>
-      <p className={`num mt-0.5 truncate text-[15px] font-bold ${accent ? 'text-accent-deep' : ''}`}>
+      <p className={`num mt-0.5 truncate text-[15px] font-bold ${accent ? 'text-accent' : ''}`}>
         {formatMoney(value)}
       </p>
     </div>

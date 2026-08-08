@@ -45,19 +45,19 @@ export function MissingStatementsBanner({ completeness, monthLabel }: Props) {
       {showSuspect && (
         <div
           role="status"
-          className="flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
+          className="flex items-start justify-between gap-3 rounded-xl border border-warn/25 bg-warn-soft px-4 py-3"
         >
           <div className="min-w-0">
-            <p className="text-sm font-medium text-amber-800">
+            <p className="text-sm font-medium text-warn">
               Statement may be lower than expected
             </p>
-            <p className="mt-0.5 text-xs text-amber-700">
+            <p className="mt-0.5 text-xs text-ink-soft">
               {completeness.suspectStatements.map((m) => m.cardName).join(', ')} — logged charges are less than the fixed bills assigned to that card. Check that you entered Purchases, not the New Balance (or the big annual charge lands in a different cycle).
             </p>
           </div>
           <Link
             to="/manage"
-            className="shrink-0 text-xs font-semibold text-amber-700 transition-colors hover:text-amber-800"
+            className="shrink-0 text-xs font-semibold text-warn transition-colors hover:text-warn/80"
             aria-label="Review card statements in Manage"
           >
             Review →

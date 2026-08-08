@@ -11,14 +11,14 @@ export function MoneyManMark({ className = 'size-9' }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
     >
-      <rect width="40" height="40" rx="11" fill="#0e7a6d" />
-      <circle cx="20" cy="20" r="11.5" stroke="#e4f0ed" strokeWidth="1.5" opacity="0.35" />
+      <rect width="40" height="40" rx="11" fill="#1fd6b5" />
+      <circle cx="20" cy="20" r="11.5" stroke="#070c0b" strokeWidth="1.5" opacity="0.25" />
       {/* Rising bars */}
-      <rect x="12" y="22" width="3.5" height="6" rx="1" fill="#e4f0ed" opacity="0.55" />
-      <rect x="18.25" y="17" width="3.5" height="11" rx="1" fill="#e4f0ed" opacity="0.8" />
-      <rect x="24.5" y="12.5" width="3.5" height="15.5" rx="1" fill="#f6f5f1" />
+      <rect x="12" y="22" width="3.5" height="6" rx="1" fill="#070c0b" opacity="0.4" />
+      <rect x="18.25" y="17" width="3.5" height="11" rx="1" fill="#070c0b" opacity="0.65" />
+      <rect x="24.5" y="12.5" width="3.5" height="15.5" rx="1" fill="#070c0b" />
       {/* Soft accent tip */}
-      <circle cx="26.25" cy="11" r="1.6" fill="#d29b78" />
+      <circle cx="26.25" cy="11" r="1.6" fill="#f0a070" />
     </svg>
   )
 }

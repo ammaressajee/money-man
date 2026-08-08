@@ -71,7 +71,7 @@ export default function Dashboard() {
           <p className="mt-1 text-sm text-ink-soft">{error}</p>
           <button
             onClick={() => void refresh()}
-            className="mt-4 rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-deep"
+            className="mt-4 rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-solid transition-colors hover:bg-accent-deep"
           >
             Try again
           </button>
@@ -142,10 +142,10 @@ export default function Dashboard() {
               </span>
             </div>
             <div className="mt-4 flex gap-2" aria-hidden>
-              <span className="rounded-full bg-ink px-2.5 py-1 text-[11px] font-medium text-white">
+              <span className="rounded-full bg-solid px-2.5 py-1 text-[11px] font-medium text-ink ring-1 ring-line">
                 Paycheck
               </span>
-              <span className="rounded-full bg-accent-soft px-2.5 py-1 text-[11px] font-medium text-accent-deep">
+              <span className="rounded-full bg-accent-soft px-2.5 py-1 text-[11px] font-medium text-accent">
                 Wealth
               </span>
               <span className="rounded-full bg-clay-soft px-2.5 py-1 text-[11px] font-medium text-clay">
@@ -205,33 +205,35 @@ function HeroCard({ summary, prior }: { summary: MonthlySummary; prior?: Monthly
   const isNegative = netWealthChange < 0
   const hasDrawdown = savingsDraw > 0
 
-  const heroBg = isNegative
-    ? 'bg-danger'
+  const heroTone = isNegative
+    ? 'bg-danger text-white'
     : hasDrawdown
-      ? 'bg-accent-deep/90'
-      : 'bg-accent-deep'
+      ? 'bg-accent/90 text-solid'
+      : 'bg-accent text-solid'
 
   return (
     <section
-      className={`rise rounded-card p-6 text-white shadow-card-lg ${heroBg}`}
+      className={`rise rounded-card p-6 shadow-card-lg ${heroTone}`}
       style={riseOrder(0)}
     >
-      <h2 className="text-sm font-medium text-white/70">Net wealth this month</h2>
+      <h2 className={`text-sm font-medium ${isNegative ? 'text-white/70' : 'text-solid/70'}`}>
+        Net wealth this month
+      </h2>
       <p className="mt-2 text-[52px] font-extrabold leading-none tracking-tight">
         <AnimatedNumber value={netWealthChange} />
       </p>
-      <p className="mt-3 text-sm text-white/70">
+      <p className={`mt-3 text-sm ${isNegative ? 'text-white/70' : 'text-solid/70'}`}>
         {combinedIncome > 0
           ? `${formatPercent(netSavingsRate)} of combined income building wealth`
           : 'Add income to see this as a share of earnings'}
       </p>
       {hasDrawdown && (
-        <p className="mt-1.5 text-xs text-white/60">
+        <p className={`mt-1.5 text-xs ${isNegative ? 'text-white/60' : 'text-solid/60'}`}>
           −{formatMoney(savingsDraw)} drawn from savings to cover shortfall · Roth still funded
         </p>
       )}
       {momDelta !== null && (
-        <p className="mt-1.5 text-xs text-white/50">
+        <p className={`mt-1.5 text-xs ${isNegative ? 'text-white/50' : 'text-solid/55'}`}>
           {momDelta >= 0 ? '+' : ''}
           {formatMoney(momDelta)} vs last month
         </p>
@@ -331,7 +333,7 @@ function GuidelinesCard({ summary }: { summary: MonthlySummary }) {
   const statusDot: Record<string, string> = {
     'on-track': 'bg-accent',
     'over': 'bg-danger',
-    'under': 'bg-amber-400',
+    'under': 'bg-warn',
     'info': 'bg-line',
   }
 
@@ -399,7 +401,7 @@ function GuidelineRowItem({
           {row.label}
         </span>
         <span className="flex items-baseline gap-1.5">
-          <span className={`num font-semibold ${isOver ? 'text-danger' : isUnder ? 'text-amber-600' : ''}`}>
+          <span className={`num font-semibold ${isOver ? 'text-danger' : isUnder ? 'text-warn' : ''}`}>
             {formatMoney(row.actualAmount)}
           </span>
           <span className="text-xs text-ink-faint">
@@ -411,7 +413,7 @@ function GuidelineRowItem({
       <div className="relative mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-paper">
         <div
           className={`h-full rounded-full transition-[width] duration-700 ${
-            isOver ? 'bg-danger' : isUnder ? 'bg-amber-400' : 'bg-accent'
+            isOver ? 'bg-danger' : isUnder ? 'bg-warn' : 'bg-accent'
           }`}
           style={{ width: `${Math.min(100, fillPct * 100)}%` }}
         />
@@ -427,7 +429,7 @@ function GuidelineRowItem({
         {row.note && <p className="text-[11px] text-ink-faint">{row.note}</p>}
         {row.status !== 'info' && (
           <p className={`ml-auto shrink-0 text-[11px] font-medium ${
-            isOver ? 'text-danger' : isUnder ? 'text-amber-600' : 'text-accent-deep'
+            isOver ? 'text-danger' : isUnder ? 'text-warn' : 'text-accent'
           }`}>
             {guidelineStatusLabel(row.status)}
           </p>

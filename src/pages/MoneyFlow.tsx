@@ -91,7 +91,7 @@ export default function MoneyFlow() {
           <p className="mt-1 text-sm text-ink-soft">{error}</p>
           <button
             onClick={() => void refresh()}
-            className="mt-4 rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-deep"
+            className="mt-4 rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-solid transition-colors hover:bg-accent-deep"
           >
             Try again
           </button>
@@ -139,7 +139,7 @@ export default function MoneyFlow() {
           )}
 
           <section className="rise overflow-hidden rounded-card bg-card shadow-card" style={riseOrder(0)}>
-            <div className="border-b border-line/80 bg-[linear-gradient(180deg,#ffffff_0%,#faf9f6_100%)] px-4 pb-4 pt-4 sm:px-5 sm:pt-5">
+            <div className="border-b border-line/80 bg-[linear-gradient(180deg,#141c1a_0%,#111917_100%)] px-4 pb-4 pt-4 sm:px-5 sm:pt-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-faint">

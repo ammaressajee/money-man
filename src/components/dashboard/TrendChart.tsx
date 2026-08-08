@@ -36,26 +36,26 @@ export function TrendChart({ summaries, selectedKey }: Props) {
           <AreaChart data={rows} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
             <defs>
               <linearGradient id="investedFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#0e7a6d" stopOpacity={0.22} />
-                <stop offset="100%" stopColor="#0e7a6d" stopOpacity={0.02} />
+                <stop offset="0%" stopColor="#1fd6b5" stopOpacity={0.35} />
+                <stop offset="100%" stopColor="#1fd6b5" stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="spendFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#b96a45" stopOpacity={0.15} />
-                <stop offset="100%" stopColor="#b96a45" stopOpacity={0.01} />
+                <stop offset="0%" stopColor="#f0a070" stopOpacity={0.28} />
+                <stop offset="100%" stopColor="#f0a070" stopOpacity={0.02} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} stroke="#e9e7e0" />
+            <CartesianGrid vertical={false} stroke="#1e2c28" />
             <XAxis
               dataKey="label"
               tickLine={false}
               axisLine={false}
-              tick={{ fontSize: 11, fill: '#66746f' }}
+              tick={{ fontSize: 11, fill: '#8fa39b' }}
             />
             <YAxis
               tickLine={false}
               axisLine={false}
               width={44}
-              tick={{ fontSize: 11, fill: '#99a5a0' }}
+              tick={{ fontSize: 11, fill: '#5c7169' }}
               tickFormatter={(v: number) => {
                 if (v >= 1000) return `${Math.round(v / 1000)}k`
                 return String(Math.round(v))
@@ -65,18 +65,20 @@ export function TrendChart({ summaries, selectedKey }: Props) {
               formatter={(value, name) => [formatMoney(Number(value)), String(name)]}
               contentStyle={{
                 borderRadius: 12,
-                border: '1px solid #e9e7e0',
-                boxShadow: '0 8px 24px -12px rgb(23 39 35 / 0.2)',
+                border: '1px solid #1e2c28',
+                background: '#111917',
+                color: '#e8f0ed',
+                boxShadow: '0 12px 32px -12px rgb(0 0 0 / 0.55)',
                 fontSize: 12,
               }}
             />
             {selectedKey && (
               <ReferenceLine
                 x={rows.find((r) => r.key === selectedKey)?.label}
-                stroke="#0e7a6d"
+                stroke="#1fd6b5"
                 strokeWidth={1.5}
                 strokeDasharray="3 3"
-                strokeOpacity={0.5}
+                strokeOpacity={0.55}
               />
             )}
             {/* Solid: logged card + debit spend (truly month-specific) */}
@@ -84,7 +86,7 @@ export function TrendChart({ summaries, selectedKey }: Props) {
               type="monotone"
               dataKey="loggedSpend"
               name="Logged spend"
-              stroke="#b96a45"
+              stroke="#f0a070"
               strokeWidth={2}
               fill="url(#spendFill)"
               dot={false}
@@ -94,7 +96,7 @@ export function TrendChart({ summaries, selectedKey }: Props) {
               type="monotone"
               dataKey="income"
               name="Income (today's setup)"
-              stroke="#99a5a0"
+              stroke="#8fa39b"
               strokeWidth={2}
               strokeDasharray="5 4"
               fill="transparent"
@@ -105,7 +107,7 @@ export function TrendChart({ summaries, selectedKey }: Props) {
               type="monotone"
               dataKey="invested"
               name="Net wealth (today's setup)"
-              stroke="#0e7a6d"
+              stroke="#1fd6b5"
               strokeWidth={2.5}
               strokeDasharray="5 4"
               fill="url(#investedFill)"
@@ -125,7 +127,7 @@ export function TrendChart({ summaries, selectedKey }: Props) {
           <span
             className="h-0.5 w-4 rounded-full"
             style={{
-              background: 'repeating-linear-gradient(to right, #99a5a0 0, #99a5a0 4px, transparent 4px, transparent 7px)',
+              background: 'repeating-linear-gradient(to right, #8fa39b 0, #8fa39b 4px, transparent 4px, transparent 7px)',
             }}
           />
           Income
@@ -134,7 +136,7 @@ export function TrendChart({ summaries, selectedKey }: Props) {
           <span
             className="h-0.5 w-4 rounded-full"
             style={{
-              background: 'repeating-linear-gradient(to right, #0e7a6d 0, #0e7a6d 4px, transparent 4px, transparent 7px)',
+              background: 'repeating-linear-gradient(to right, #1fd6b5 0, #1fd6b5 4px, transparent 4px, transparent 7px)',
             }}
           />
           Net wealth

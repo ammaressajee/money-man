@@ -77,12 +77,12 @@ export function FlowSankey({ summary }: { summary: MonthlySummary }) {
   const tonesPresent = new Set(layout?.nodes.map((n) => n.tone) ?? [])
 
   const ribbonOpacity = (index: number, sourceId: string, targetId: string) => {
-    if (highlighted === index) return 0.82
+    if (highlighted === index) return 0.9
     if (focusedNode !== null) {
-      return sourceId === focusedNode || targetId === focusedNode ? 0.7 : 0.08
+      return sourceId === focusedNode || targetId === focusedNode ? 0.78 : 0.1
     }
-    if (highlighted !== null) return 0.14
-    return 0.46
+    if (highlighted !== null) return 0.16
+    return 0.58
   }
 
   function selectLink(index: number) {
@@ -122,15 +122,15 @@ export function FlowSankey({ summary }: { summary: MonthlySummary }) {
     <div className="sankey-shell">
       <div
         ref={shellRef}
-        className="relative overflow-hidden rounded-2xl bg-[linear-gradient(165deg,#faf9f6_0%,#f3f1eb_48%,#eef5f3_100%)] ring-1 ring-line/80"
+        className="relative overflow-hidden rounded-2xl bg-[linear-gradient(165deg,#0c1412_0%,#0f1a17_48%,#0d1f1b_100%)] ring-1 ring-line/80"
       >
         {/* Soft atmosphere */}
         <div
-          className="pointer-events-none absolute inset-0 opacity-70"
+          className="pointer-events-none absolute inset-0 opacity-80"
           aria-hidden
           style={{
             background:
-              'radial-gradient(ellipse 70% 55% at 18% 22%, rgb(14 122 109 / 0.07), transparent 60%), radial-gradient(ellipse 55% 45% at 88% 78%, rgb(185 106 69 / 0.08), transparent 55%)',
+              'radial-gradient(ellipse 70% 55% at 18% 22%, rgb(31 214 181 / 0.12), transparent 60%), radial-gradient(ellipse 55% 45% at 88% 78%, rgb(240 160 112 / 0.1), transparent 55%)',
           }}
         />
 
@@ -268,17 +268,17 @@ export function FlowSankey({ summary }: { summary: MonthlySummary }) {
 
 function FlowDetailCard({ link }: { link: SankeyLink }) {
   return (
-    <div className="pointer-events-none flex items-center justify-between gap-3 rounded-xl bg-ink/92 px-3.5 py-2.5 text-white shadow-[0_12px_32px_-12px_rgb(23_39_35_/_0.55)] backdrop-blur-sm">
+    <div className="pointer-events-none flex items-center justify-between gap-3 rounded-xl bg-solid/95 px-3.5 py-2.5 text-ink shadow-[0_12px_32px_-12px_rgb(0_0_0_/_0.65)] ring-1 ring-line backdrop-blur-sm">
       <div className="min-w-0">
-        <p className="truncate text-[11px] font-medium text-white/65">
+        <p className="truncate text-[11px] font-medium text-ink-soft">
           {link.source.label}
-          <span className="mx-1.5 text-white/35">→</span>
+          <span className="mx-1.5 text-ink-faint">→</span>
           {link.target.label}
         </p>
       </div>
       <p className="num shrink-0 text-sm font-semibold tracking-tight">
         {formatMoney(link.value)}
-        <span className="ml-0.5 text-[10px] font-medium text-white/50">/mo</span>
+        <span className="ml-0.5 text-[10px] font-medium text-ink-faint">/mo</span>
       </p>
     </div>
   )
@@ -382,7 +382,7 @@ function NodeGroup({
           fontSize={isMobile ? 10 : 11}
           style={{
             paintOrder: 'stroke',
-            stroke: '#faf9f6',
+            stroke: '#070c0b',
             strokeWidth: isMobile ? 3.5 : 3.25,
             strokeLinejoin: 'round',
             pointerEvents: 'none',
@@ -390,14 +390,14 @@ function NodeGroup({
         >
           <tspan
             fontWeight={600}
-            fill={node.tone === 'shortfall' ? '#b3452f' : '#172723'}
+            fill={node.tone === 'shortfall' ? '#ff6b4a' : '#e8f0ed'}
           >
             {shortLabel}
           </tspan>
           {showAmount && (
             <tspan
               className="num"
-              fill="#66746f"
+              fill="#8fa39b"
               dx={amountBelow ? 0 : 5}
               dy={amountBelow ? 11 : 0}
               x={amountBelow ? labelX : undefined}

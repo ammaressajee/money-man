@@ -62,7 +62,7 @@ export function SetupChecklist({ status }: Props) {
             >
               <CheckIcon done={done} />
               <div>
-                <p className={`text-sm font-semibold ${done ? 'text-accent-deep' : 'text-ink'}`}>
+                <p className={`text-sm font-semibold ${done ? 'text-accent' : 'text-ink'}`}>
                   {step.label}
                 </p>
                 <p className="text-xs text-ink-soft">{step.detail}</p>
@@ -79,7 +79,7 @@ export function SetupChecklist({ status }: Props) {
           >
             <CheckIcon done={status.hasCurrentMonthStatements} />
             <div>
-              <p className={`text-sm font-semibold ${status.hasCurrentMonthStatements ? 'text-accent-deep' : 'text-ink'}`}>
+              <p className={`text-sm font-semibold ${status.hasCurrentMonthStatements ? 'text-accent' : 'text-ink'}`}>
                 Log this month's card balances
               </p>
               <p className="text-xs text-ink-soft">Once per billing cycle — takes 30 seconds</p>
@@ -91,7 +91,7 @@ export function SetupChecklist({ status }: Props) {
       <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
         <Link
           to={`/manage`}
-          className="inline-block rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-deep"
+          className="inline-block rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-solid transition-colors hover:bg-accent-deep"
         >
           {firstIncomplete ? `Add ${firstIncomplete.label.toLowerCase()}` : 'Manage data'}
         </Link>

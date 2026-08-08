@@ -31,18 +31,18 @@ export interface FlowGraph {
 
 /** Hex values mirror the CSS theme tokens in index.css (SVG needs literals). */
 const TONE_COLORS = {
-  income: '#172723',
-  checking: '#3d5049',
-  joint: '#6b7a74',
-  save: '#4a9a8b',
-  invest: '#0e7a6d',
-  retire: '#2b5d70',
-  jointBills: '#9c4f2e',
-  bills: '#b96a45',
-  cards: '#c58057',
-  other: '#d29b78',
-  leftover: '#a9b3ae',
-  shortfall: '#b3452f',
+  income: '#e8f0ed',
+  checking: '#7a948a',
+  joint: '#a8c0b6',
+  save: '#3ecfba',
+  invest: '#1fd6b5',
+  retire: '#5eb0d4',
+  jointBills: '#e8894f',
+  bills: '#f0a070',
+  cards: '#f5b48a',
+  other: '#d4a07a',
+  leftover: '#5c7169',
+  shortfall: '#ff6b4a',
 } as const
 
 /** Flows under 50¢/mo are noise — drop them so the diagram stays clean. */

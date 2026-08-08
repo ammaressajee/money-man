@@ -124,8 +124,8 @@ function PersonColumn({
 
 function Inflow({ label, amount }: { label: string; amount?: string }) {
   return (
-    <div className="rounded-xl bg-ink px-3 py-2.5 text-center text-white">
-      <p className="text-[11px] font-medium text-white/70">{label}</p>
+    <div className="rounded-xl bg-solid px-3 py-2.5 text-center text-ink ring-1 ring-line">
+      <p className="text-[11px] font-medium text-ink-soft">{label}</p>
       {amount && <p className="num mt-0.5 text-sm font-bold">{amount}</p>}
     </div>
   )
@@ -146,7 +146,7 @@ function AccountNode({
 }) {
   const tones = {
     account: 'border-line bg-card text-ink',
-    wealth: 'border-accent/25 bg-accent-soft text-accent-deep',
+    wealth: 'border-accent/25 bg-accent-soft text-accent',
     spend: 'border-clay/25 bg-clay-soft text-clay',
   }
   return (
@@ -165,7 +165,7 @@ function Chip({ children, tone }: { children: string; tone: 'spend' | 'wealth' }
   return (
     <span
       className={`rounded-full px-3 py-1 text-xs font-medium ${
-        tone === 'spend' ? 'bg-clay-soft text-clay' : 'bg-accent-soft text-accent-deep'
+        tone === 'spend' ? 'bg-clay-soft text-clay' : 'bg-accent-soft text-accent'
       }`}
     >
       {children}

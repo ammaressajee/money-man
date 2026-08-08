@@ -1,7 +1,7 @@
 import { useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from 'react'
 
 export const btnPrimary =
-  'rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-deep disabled:opacity-60'
+  'rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-solid transition-colors hover:bg-accent-deep disabled:opacity-60'
 export const btnGhost =
   'rounded-xl px-4 py-2.5 text-sm font-semibold text-ink-soft transition-colors hover:text-ink'
 export const btnDanger =

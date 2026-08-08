@@ -58,7 +58,7 @@ export default function ManageData() {
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
             className={`flex-1 rounded-lg px-2 py-2.5 text-sm font-medium transition-colors ${
-              tab === t.id ? 'bg-accent-soft font-semibold text-accent-deep' : 'text-ink-soft hover:text-ink'
+              tab === t.id ? 'bg-accent-soft font-semibold text-accent' : 'text-ink-soft hover:text-ink'
             }`}
           >
             {t.label}
