@@ -29,6 +29,7 @@ export function MonthlyFlowCard({
 
   const bills = summary.jointExpenses + summary.ammar.personalExpenses + summary.fiancee.personalExpenses
   const cards = summary.ammar.cardSpend + summary.fiancee.cardSpend
+  const totalOverlap = summary.ammar.cardFixedOverlap + summary.fiancee.cardFixedOverlap
   const other = summary.ammar.otherSpend + summary.fiancee.otherSpend
 
   const segments = [
@@ -78,7 +79,11 @@ export function MonthlyFlowCard({
           barClass="bg-clay"
           detail={[
             bills > 0 ? `Bills ${formatMoney(bills)}` : null,
-            cards > 0 ? `Cards ${formatMoney(cards)}` : null,
+            cards > 0
+              ? totalOverlap > 0
+                ? `Cards ${formatMoney(cards)} (${formatMoney(totalOverlap)} in bills netted out)`
+                : `Cards ${formatMoney(cards)}`
+              : null,
             other > 0 ? `Other ${formatMoney(other)}` : null,
           ]
             .filter(Boolean)

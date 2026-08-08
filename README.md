@@ -113,6 +113,46 @@ flowchart TB
   multiple entries per month; an optional label notes what each was for.
 - One-time income counts in the month it was entered.
 
+## Which number do I enter for a card statement?
+
+Enter **New Charges** — the total of purchases, fees, and interest for that
+cycle. **Not** the "New Balance" printed at the top of the statement.
+
+| Statement field | Enter it? | Why |
+|---|---|---|
+| Purchases / New charges | ✅ Yes, this is it | Measures what you actually spent |
+| Fees & interest | ✅ Add to purchases | Real cost of using the card |
+| New Balance | ❌ No | Distorted by payment timing and carried balances |
+| Minimum Payment Due | ❌ No | Arbitrary minimum, not actual spend |
+| Payments & Credits | ❌ No | What you sent to the card, not what you spent |
+
+**Can't find the Purchases line?** Use the built-in statement calculator
+(tap "Find it from my statement" in the card form). Enter New Balance,
+Previous Balance, and Payments & Credits — it computes purchases for you:
+
+```
+New Charges = New Balance − Previous Balance + Payments & Credits
+```
+
+### Edge cases
+
+- **Paid in full before closing date** → New Balance may show $0, but your
+  Purchases line still reflects actual spend. Use the calculator.
+- **Carried balance from last month** → Still enter only this cycle's
+  Purchases. Carried debt was already counted in a prior month.
+- **Refund-heavy cycle** → Negative values are allowed. The net is clamped
+  to zero in the monthly totals (a refund doesn't reduce your other spending).
+- **Fixed bill on a card (e.g. insurance autopay)** → Set "Paid with" on the
+  fixed item to that card. The app nets it out of the statement total so
+  the bill isn't counted twice — once as a fixed item and again in the
+  statement. The fixed item remains the authoritative source for that
+  bill's amount every month.
+- **Annual bill (e.g. $1,200 insurance in January)** → The full charge lands
+  in January's statement. The app nets out 1/12 ($100) each month as a
+  fixed-item overlap. In January that means $100 is netted while $1,100
+  shows as card spend — this is intentional; the annual amount is still
+  tracked correctly in the Insurance category across all months.
+
 ## Local verification
 
 ```bash

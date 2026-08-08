@@ -21,6 +21,7 @@ export function FixedItemsSection() {
   const [adding, setAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const items = data?.fixedItems ?? []
+  const activeCards = (data?.creditCards ?? []).filter((c) => c.active)
 
   const categories = [...new Set(items.map((f) => f.category))].sort()
 
@@ -40,7 +41,7 @@ export function FixedItemsSection() {
               .map((f) =>
                 editingId === f.id ? (
                   <li key={f.id}>
-                    <FixedItemForm initial={f} onDone={() => setEditingId(null)} />
+                    <FixedItemForm initial={f} activeCards={activeCards} onDone={() => setEditingId(null)} />
                   </li>
                 ) : (
                   <li key={f.id}>
@@ -58,6 +59,10 @@ export function FixedItemsSection() {
                         <span className="block text-xs text-ink-soft">
                           {OWNER_LABELS[f.owner]} · {f.frequency === 'annual' ? 'Annual' : 'Monthly'}
                           {!f.active && ' · Inactive'}
+                          {f.paid_via_card_id && (() => {
+                            const card = activeCards.find((c) => c.id === f.paid_via_card_id)
+                            return card ? ` · via ${card.name}` : null
+                          })()}
                         </span>
                       </span>
                       <span className="num text-sm font-bold">{formatMoneyExact(f.amount)}</span>
@@ -70,7 +75,7 @@ export function FixedItemsSection() {
       ))}
 
       {adding ? (
-        <FixedItemForm onDone={() => setAdding(false)} />
+        <FixedItemForm activeCards={activeCards} onDone={() => setAdding(false)} />
       ) : (
         <button onClick={() => setAdding(true)} className={`${btnPrimary} w-full`}>
           Add fixed item
@@ -96,7 +101,20 @@ function KindBadge({ kind }: { kind: FixedKind }) {
   )
 }
 
-function FixedItemForm({ initial, onDone }: { initial?: FixedItem; onDone: () => void }) {
+interface ActiveCard {
+  id: string
+  name: string
+}
+
+function FixedItemForm({
+  initial,
+  activeCards,
+  onDone,
+}: {
+  initial?: FixedItem
+  activeCards: ActiveCard[]
+  onDone: () => void
+}) {
   const { insert, update } = useHouseholdData()
   const { run, busy, error } = useAsyncAction()
   const [name, setName] = useState(initial?.name ?? '')
@@ -105,6 +123,7 @@ function FixedItemForm({ initial, onDone }: { initial?: FixedItem; onDone: () =>
   const [category, setCategory] = useState(initial?.category ?? 'Housing')
   const [kind, setKind] = useState<FixedKind>(initial?.kind ?? 'expense')
   const [owner, setOwner] = useState<ItemOwner>(initial?.owner ?? 'joint')
+  const [paidViaCardId, setPaidViaCardId] = useState<string>(initial?.paid_via_card_id ?? '')
   const [invalid, setInvalid] = useState<string | null>(null)
 
   async function onSubmit(e: FormEvent) {
@@ -119,6 +138,8 @@ function FixedItemForm({ initial, onDone }: { initial?: FixedItem; onDone: () =>
       category,
       kind,
       owner,
+      // Only link to a card for expense items; wealth items aren't purchases.
+      paid_via_card_id: kind === 'expense' && paidViaCardId ? paidViaCardId : null,
       active: initial?.active ?? true,
     }
     const ok = await run(() =>
@@ -176,7 +197,11 @@ function FixedItemForm({ initial, onDone }: { initial?: FixedItem; onDone: () =>
             { value: 'retirement', label: 'Retire' },
           ]}
           value={kind}
-          onChange={setKind}
+          onChange={(v) => {
+            setKind(v)
+            // Clear card link when switching away from expense
+            if (v !== 'expense') setPaidViaCardId('')
+          }}
         />
         <p className="mt-1.5 text-xs font-normal text-ink-faint">
           Saving = cash (HYSA, emergency fund) · Invest = brokerage · Retire = Roth IRA, 401(k)
@@ -193,6 +218,29 @@ function FixedItemForm({ initial, onDone }: { initial?: FixedItem; onDone: () =>
           onChange={setOwner}
         />
       </Field>
+
+      {kind === 'expense' && (
+        <div>
+          <label className="block text-sm font-medium">
+            Paid with
+            <SelectInput
+              value={paidViaCardId}
+              onChange={(e) => setPaidViaCardId(e.target.value)}
+            >
+              <option value="">Bank account / debit</option>
+              {activeCards.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </SelectInput>
+          </label>
+          <p className="mt-1.5 text-xs text-ink-faint">
+            If this bill autopays on a credit card, pick it so it isn't counted twice in the statement total.
+          </p>
+        </div>
+      )}
+
       <FormError message={invalid ?? error} />
       <div className="flex items-center justify-between">
         {initial ? (

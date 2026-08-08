@@ -1,8 +1,8 @@
 import type { HouseholdData } from '../types/db'
 import { monthStart, toMonthDateString } from './money'
 
-// v2: wealth kinds split into saving / investment / retirement
-const STORAGE_KEY = 'our-money-demo-v2'
+// v3: paid_via_card_id on fixed items; new-charges model for statements
+const STORAGE_KEY = 'our-money-demo-v3'
 
 function iso(d: Date): string {
   return d.toISOString()
@@ -82,18 +82,19 @@ function buildSeed(): HouseholdData {
       },
     ],
     fixedItems: [
-      { id: 'fx-1', name: 'Rent', amount: 1875, frequency: 'monthly', category: 'Housing', kind: 'expense', owner: 'joint', active: true, created_at: origin },
-      { id: 'fx-2', name: 'Electric + Gas', amount: 145, frequency: 'monthly', category: 'Utilities', kind: 'expense', owner: 'joint', active: true, created_at: origin },
-      { id: 'fx-3', name: 'Internet', amount: 65, frequency: 'monthly', category: 'Utilities', kind: 'expense', owner: 'joint', active: true, created_at: origin },
-      { id: 'fx-4', name: 'Streaming Bundle', amount: 32, frequency: 'monthly', category: 'Subscriptions', kind: 'expense', owner: 'joint', active: true, created_at: origin },
-      { id: 'fx-5', name: 'Car Note', amount: 415, frequency: 'monthly', category: 'Car', kind: 'expense', owner: 'ammar', active: true, created_at: origin },
-      { id: 'fx-6', name: 'Car Insurance', amount: 1560, frequency: 'annual', category: 'Insurance', kind: 'expense', owner: 'ammar', active: true, created_at: origin },
-      { id: 'fx-7', name: 'Car Insurance', amount: 1240, frequency: 'annual', category: 'Insurance', kind: 'expense', owner: 'fiancee', active: true, created_at: origin },
-      { id: 'fx-8', name: 'Gym', amount: 45, frequency: 'monthly', category: 'Subscriptions', kind: 'expense', owner: 'fiancee', active: true, created_at: origin },
-      { id: 'fx-9', name: 'Roth IRA', amount: 583, frequency: 'monthly', category: 'Retirement', kind: 'retirement', owner: 'ammar', active: true, created_at: origin },
-      { id: 'fx-10', name: 'Roth IRA', amount: 500, frequency: 'monthly', category: 'Retirement', kind: 'retirement', owner: 'fiancee', active: true, created_at: origin },
-      { id: 'fx-11', name: 'Index Funds', amount: 300, frequency: 'monthly', category: 'Investing', kind: 'investment', owner: 'ammar', active: true, created_at: origin },
-      { id: 'fx-12', name: 'High-Yield Savings', amount: 150, frequency: 'monthly', category: 'Savings', kind: 'saving', owner: 'fiancee', active: true, created_at: origin },
+      { id: 'fx-1',  name: 'Rent',              amount: 1875, frequency: 'monthly', category: 'Housing',       kind: 'expense',     owner: 'joint',    paid_via_card_id: null, active: true, created_at: origin },
+      { id: 'fx-2',  name: 'Electric + Gas',     amount: 145,  frequency: 'monthly', category: 'Utilities',     kind: 'expense',     owner: 'joint',    paid_via_card_id: null, active: true, created_at: origin },
+      // Internet autopays on Ammar's Chase Sapphire — demonstrating the netting feature.
+      { id: 'fx-3',  name: 'Internet',           amount: 65,   frequency: 'monthly', category: 'Utilities',     kind: 'expense',     owner: 'joint',    paid_via_card_id: 'card-a1', active: true, created_at: origin },
+      { id: 'fx-4',  name: 'Streaming Bundle',   amount: 32,   frequency: 'monthly', category: 'Subscriptions', kind: 'expense',     owner: 'joint',    paid_via_card_id: null, active: true, created_at: origin },
+      { id: 'fx-5',  name: 'Car Note',           amount: 415,  frequency: 'monthly', category: 'Car',           kind: 'expense',     owner: 'ammar',    paid_via_card_id: null, active: true, created_at: origin },
+      { id: 'fx-6',  name: 'Car Insurance',      amount: 1560, frequency: 'annual',  category: 'Insurance',     kind: 'expense',     owner: 'ammar',    paid_via_card_id: null, active: true, created_at: origin },
+      { id: 'fx-7',  name: 'Car Insurance',      amount: 1240, frequency: 'annual',  category: 'Insurance',     kind: 'expense',     owner: 'fiancee',  paid_via_card_id: null, active: true, created_at: origin },
+      { id: 'fx-8',  name: 'Gym',                amount: 45,   frequency: 'monthly', category: 'Subscriptions', kind: 'expense',     owner: 'fiancee',  paid_via_card_id: null, active: true, created_at: origin },
+      { id: 'fx-9',  name: 'Roth IRA',           amount: 583,  frequency: 'monthly', category: 'Retirement',    kind: 'retirement',  owner: 'ammar',    paid_via_card_id: null, active: true, created_at: origin },
+      { id: 'fx-10', name: 'Roth IRA',           amount: 500,  frequency: 'monthly', category: 'Retirement',    kind: 'retirement',  owner: 'fiancee',  paid_via_card_id: null, active: true, created_at: origin },
+      { id: 'fx-11', name: 'Index Funds',        amount: 300,  frequency: 'monthly', category: 'Investing',     kind: 'investment',  owner: 'ammar',    paid_via_card_id: null, active: true, created_at: origin },
+      { id: 'fx-12', name: 'High-Yield Savings', amount: 150,  frequency: 'monthly', category: 'Savings',       kind: 'saving',      owner: 'fiancee',  paid_via_card_id: null, active: true, created_at: origin },
     ],
     creditCards: [...cards],
     cardStatements,

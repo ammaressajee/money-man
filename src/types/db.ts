@@ -24,6 +24,12 @@ export interface FixedItem {
   category: string
   kind: FixedKind
   owner: ItemOwner
+  /**
+   * When set, this expense autopays on the given card. The summary nets it out
+   * of that card's statement total so the bill isn't counted twice.
+   * Null/undefined means paid from a bank account.
+   */
+  paid_via_card_id: string | null
   active: boolean
   created_at: string
 }

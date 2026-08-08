@@ -108,8 +108,9 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Missing statement warning */}
-          {current.completeness.isCardSpendIncomplete && (
+          {/* Missing / suspect statement warnings */}
+          {(current.completeness.isCardSpendIncomplete ||
+            current.completeness.suspectStatements.length > 0) && (
             <MissingStatementsBanner
               completeness={current.completeness}
               monthLabel={formatMonth(current.month)}

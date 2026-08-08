@@ -14,6 +14,9 @@ create table fixed_items (
   category text not null,                 -- e.g. 'Housing','Insurance','Subscriptions','Utilities','Investing','Other'
   kind text not null check (kind in ('expense','saving','investment','retirement')),
   owner text not null check (owner in ('ammar','fiancee','joint')),
+  -- When set, this expense autopays on the given card; the summary nets it out
+  -- of that card's statement total to avoid double-counting.
+  paid_via_card_id uuid references credit_cards(id) on delete set null,
   active boolean default true,
   created_at timestamptz default now()
 );
@@ -44,7 +47,10 @@ create table card_statements (
   id uuid primary key default gen_random_uuid(),
   card_id uuid references credit_cards(id) on delete cascade,
   statement_date date not null,           -- closing date of the statement
-  balance numeric not null,               -- amount owed that cycle (full cycle balance, not payment amount)
+  -- New charges that cycle: Purchases + fees & interest.
+  -- NOT the "New Balance" (which is distorted by payments/carried balances).
+  -- Can be negative when refunds exceed purchases.
+  balance numeric not null,
   created_at timestamptz default now(),
   constraint card_statements_card_id_statement_date_key unique (card_id, statement_date)
 );

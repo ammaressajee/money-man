@@ -113,8 +113,18 @@ export function FormError({ message }: { message: string | null }) {
   )
 }
 
-/** Parse a money field; returns null when invalid. */
+/** Parse a money field; returns null when invalid. Rejects negative values. */
 export function parseMoney(raw: string): number | null {
   const n = Number(raw.replace(/[$,\s]/g, ''))
   return Number.isFinite(n) && n >= 0 ? n : null
+}
+
+/**
+ * Like parseMoney but permits negative values — used for card statement charges
+ * (a refund-heavy cycle can legitimately be negative).
+ */
+export function parseMoneyAny(raw: string): number | null {
+  const cleaned = raw.replace(/[$,\s]/g, '')
+  const n = Number(cleaned)
+  return Number.isFinite(n) ? n : null
 }
